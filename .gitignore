@@ -94,3 +94,10 @@ logs/
 .terraform/
 *.tfstate
 *.tfstate.backup
+
+# ChainMind AI project-specific
+*.db
+*.sqlite
+*.sqlite3
+src/backend/ml_models/*.joblib
+

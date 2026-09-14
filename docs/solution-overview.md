@@ -2,40 +2,68 @@
 
 ## What We Built
 
-[Describe your solution in plain language. Avoid jargon — write as if explaining to a smart colleague unfamiliar with your tech stack.]
+ChainMind AI is an **AI-Powered Supply Chain Crisis Simulator** built on a Supply Chain Digital Twin. It transforms the question "what is happening now?" into "what would happen if...?" — enabling operators to simulate disruptions before they happen, compare recovery strategies, and act with data-driven confidence.
+
+## Core Concept: Predict → Simulate → Compare → Optimize → Explain → Act
+
+```
+Operator Input (Disruption Scenario)
+         ↓
+Digital Twin State (250 shipments, 48 routes, 8 ports, 95 fleet assets)
+         ↓
+Disruption Applied (port closure, weather, strike, etc.)
+         ↓
+Cascading Impact Calculation (direct + indirect shipments)
+         ↓
+Per-Shipment Risk Scoring (delay + value + cold-chain + priority + route risk)
+         ↓
+Route Optimization (NetworkX graph algorithms — Dijkstra-based)
+         ↓
+Fleet Allocation (proximity + refrigeration + capacity matching)
+         ↓
+Recovery Strategy Generation (Cheapest | Fastest | AI-Recommended)
+         ↓
+Strategy Scoring (multi-factor: cost 25% + delay 30% + cold-chain 25% + risk 20%)
+         ↓
+LLM Explanation (human-readable decision rationale)
+         ↓
+Operator Action Plan (immediate / 6h / 24h steps)
+```
 
 ## How It Works
 
-[Explain the core mechanism step by step. A numbered list or simple flow works well here.]
+1. **Operator configures a scenario**: Disruption type (port closure, weather, strike, etc.), location, duration, severity
+2. **Simulation engine loads the digital twin**: Current shipment positions, route states, fleet availability
+3. **Disruption is applied**: Affected routes and ports are removed from the logistics graph
+4. **Cascading impact is calculated**: Directly blocked shipments + indirectly affected downstream shipments
+5. **Per-shipment risk is scored**: Transparent formula combining delay, cargo value, cold-chain exposure, priority, route risk, fleet availability
+6. **Route optimizer finds alternatives**: NetworkX shortest-path algorithms on a weighted logistics graph
+7. **Fleet optimizer identifies available assets**: Distance-ranked, refrigeration-matched fleet recommendations
+8. **Three recovery strategies are generated**: Each with different cost/delay/risk trade-offs
+9. **Decision engine selects the recommendation**: Multi-factor scoring picks the optimal strategy
+10. **LLM generates explanation**: Human-readable rationale (or template fallback if no LLM configured)
+11. **Operator sees action plan**: Time-phased steps (immediate, 6h, 24h)
 
-1. [Step 1: e.g., "User connects their GitHub repository via OAuth"]
-2. [Step 2: e.g., "The system ingests pipeline logs and feeds them to watsonx.ai"]
-3. [Step 3: e.g., "An anomaly score is computed and displayed on the dashboard"]
-4. [Step 4: e.g., "Alerts are sent to Slack when the score exceeds a threshold"]
+## What-If Comparison
 
-## Architecture Diagram
+The "supply-chain time machine" feature allows comparison of multiple scenarios:
+- Mumbai Port closed 72h vs 120h vs 240h
+- High severity vs medium severity
+- One port vs another
 
-> See [`architecture.md`](architecture.md) for the detailed diagram.
-
-[Optionally include a simple ASCII or Mermaid diagram here for quick reference.]
-
-```
-[User] → [Frontend: React] → [API: FastAPI] → [watsonx.ai] → [Dashboard]
-                                    ↓
-                             [PostgreSQL DB]
-```
+Results change dynamically based on parameters — no hardcoded outputs.
 
 ## Key Design Decisions
 
 | Decision | Rationale |
 |---|---|
-| [e.g., Used watsonx.ai for anomaly detection] | [e.g., Pre-trained models reduced time-to-value vs. building from scratch] |
-| [Decision 2] | [Rationale 2] |
-| [Decision 3] | [Rationale 3] |
+| Deterministic simulation core | Reproducible, auditable results — LLM cannot change simulation outcomes |
+| SQLite default, PostgreSQL-ready | Zero setup for demo, production-scalable |
+| NetworkX graph for routing | Industry-standard graph library, efficient pathfinding |
+| Template fallback for LLM | Application works without any API key |
+| Synthetic India logistics dataset | Reliable demo without external API dependencies |
+| scikit-learn ML models | Trained on synthetic data for delay/risk prediction augmentation |
 
 ## IBM Technologies Used
 
-[Explain specifically HOW you used each IBM technology — not just that you used it.]
-
-- **[IBM Tech 1, e.g., watsonx.ai]:** [How it was used — e.g., "Used the `ibm/granite-13b-instruct-v2` model via the Python SDK to classify anomaly types from log text."]
-- **[IBM Tech 2]:** [How it was used]
+- **IBM Bob**: Primary development agent for the entire ChainMind AI system. Bob designed the architecture, implemented all backend services, frontend components, ML pipeline, and documentation through an iterative conversation-driven development process. The application is a genuine demonstration of Bob as a load-bearing development tool.
