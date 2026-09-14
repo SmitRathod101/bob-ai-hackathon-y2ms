@@ -180,7 +180,7 @@ export default function DashboardTab({ data, loading, onRefresh }: DashboardTabP
                     </td>
                     <td className="px-5 py-3 text-right text-slate-300">{sim.total_affected_shipments}</td>
                     <td className="px-5 py-3 text-right text-slate-300">{formatCurrency(sim.total_cargo_value_exposed)}</td>
-                    <td className="px-5 py-3 text-right text-slate-300">{sim.average_delay_hours.toFixed(1)}h</td>
+                    <td className="px-5 py-3 text-right text-slate-300">{(sim.average_delay_hours ?? 0).toFixed(1)}h</td>
                     <td className="px-5 py-3 text-right">
                       <span className="text-blue-400 capitalize">{sim.recommended_strategy ?? '—'}</span>
                     </td>
