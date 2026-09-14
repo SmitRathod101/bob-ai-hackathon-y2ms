@@ -34,7 +34,7 @@ async def simulate_disruption(
     7. Generates LLM-powered explanation (or template fallback)
     """
     # Validate that the location exists in our network
-    from app.optimization.route_optimizer import _normalize_location as normalize
+    from app.simulation.engine import _normalize_location as normalize
     location_normalized = normalize(request.location)
 
     # Check if we have any routes from/to this location
