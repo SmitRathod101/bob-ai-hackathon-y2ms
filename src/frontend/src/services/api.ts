@@ -68,6 +68,25 @@ export interface Shipment {
   current_temperature?: number;
 }
 
+export interface FleetVehicle {
+  vehicle_id: string;
+  vehicle_type: string;
+  carrier?: string;
+  current_location?: string;
+  capacity_kg?: number;
+  capacity_m3?: number;
+  is_refrigerated: boolean;
+  min_temp?: number;
+  max_temp?: number;
+  utilization?: number;
+  distance_km?: number;
+  reposition_hours?: number;
+  reposition_cost_inr?: number;
+  operating_cost_per_km?: number;
+  speed_kmh?: number;
+  score?: number;
+}
+
 export interface FleetSummary {
   total_vehicles: number;
   available_vehicles: number;
@@ -157,8 +176,8 @@ export interface SimulationResult {
     is_direct: boolean;
   }>;
   fleet_summary: FleetSummary;
-  available_fleet: Array<Record<string, unknown>>;
-  cold_chain_fleet: Array<Record<string, unknown>>;
+  available_fleet: FleetVehicle[];
+  cold_chain_fleet: FleetVehicle[];
   fleet_requirements: {
     standard_vehicles_needed: number;
     refrigerated_vehicles_needed: number;

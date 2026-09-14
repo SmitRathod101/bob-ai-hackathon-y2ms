@@ -1,26 +1,22 @@
 # Screenshots
 
-Place your application screenshots in this folder.
+Screenshots of the ChainMind AI application will be captured here before final submission.
 
-## Naming Convention
+## Planned Screenshots
 
-Name your screenshots sequentially so they appear in logical order:
+1. `dashboard-overview.png` — Main dashboard with KPI cards and map
+2. `scenario-config.png` — Scenario configuration panel
+3. `simulation-results.png` — Mumbai Port 72h simulation results
+4. `strategy-comparison.png` — Three strategy cards
+5. `explainable-ai.png` — Explainable AI factor grid
+6. `what-if-delta.png` — What-if delta comparison table (72h vs 120h)
+7. `what-if-radar.png` — Multi-dimension radar chart
+8. `cold-chain-panel.png` — Cold-chain risk panel
 
-  01-landing-page.png       ← First thing a user sees
-  02-main-feature.png       ← Your primary feature in action
-  03-output-or-results.png  ← The result / value delivered
-  04-additional-feature.png ← Any other notable screen
+## How to Capture
 
-## Requirements
-
-- Minimum: 3 screenshots
-- Format: PNG or JPG
-- Show the application running with real (or realistic mock) data
-- Avoid screenshots of empty states or placeholder data
-- Captions are not required but appreciated
-
-## Tips
-
-- Use a consistent browser window size across all screenshots
-- Highlight key UI elements with arrows/circles if helpful (use any image editor)
-- Include a screenshot showing IBM technology integration if applicable
+1. Start backend: `cd src/backend && uvicorn app.main:app --reload`
+2. Start frontend: `cd src/frontend && npm run dev`
+3. Open `http://localhost:5173`
+4. Run Mumbai Port 72h simulation
+5. Take screenshots of each section
