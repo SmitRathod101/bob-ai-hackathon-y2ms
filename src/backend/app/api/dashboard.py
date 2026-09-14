@@ -54,6 +54,8 @@ async def get_dashboard_summary(db: Session = Depends(get_db)):
             "severity": s.severity,
             "total_affected_shipments": s.total_affected_shipments,
             "total_cargo_value_exposed": s.total_cargo_value_exposed,
+            "average_delay_hours": s.average_delay_hours,
+            "recommended_strategy": s.recommended_strategy,
             "status": s.status,
             "created_at": s.created_at.isoformat() if s.created_at else None,
         }
