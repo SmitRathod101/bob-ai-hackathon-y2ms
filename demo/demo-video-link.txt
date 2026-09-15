@@ -1,13 +1,12 @@
-https://youtu.be/chainmind-demo-placeholder
+https://youtu.be/yNumP-njqTQ
 
 ChainMind AI — Supply Chain Crisis Simulator
 IBM Bobathon 2025
 
-Demo video will be recorded and uploaded here before final submission.
-The demo will show:
+Demo video shows:
 1. Dashboard overview (250 shipments, 8 ports, fleet status)
 2. Mumbai Port closure simulation (72 hours, high severity)
-3. Cascading impact view (78 affected shipments, cold-chain risk)
-4. Three recovery strategies with comparison
+3. Cascading impact view (~78 affected shipments, cold-chain risk)
+4. Three recovery strategies with costs and risk levels
 5. Explainable AI recommendation
 6. What-If comparison: 72h vs 120h (results visibly change)

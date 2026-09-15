@@ -86,39 +86,48 @@ submission.yaml
 
 ---
 
-## ⚡ How to Run
+## 🖥️ Demo
 
-See full instructions in [`docs/setup-guide.md`](docs/setup-guide.md)
+| Artifact | Link |
+|---|---|
+| 📹 Demo Video | [https://youtu.be/yNumP-njqTQ](https://youtu.be/yNumP-njqTQ) |
+| 🌐 Live Demo | **NOT DEPLOYED** — run locally using [`docs/setup-guide.md`](docs/setup-guide.md) |
+| 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
+| 📊 Presentation | [See presentation/](presentation/) |
+
+---
+
+## ⚡ Run Locally
+
+ChainMind AI is not deployed. Run it locally by following **[`docs/setup-guide.md`](docs/setup-guide.md)** — it covers prerequisites, all installation steps, environment variables, database setup, verification, the demo workflow, and troubleshooting.
+
+**Quick-start summary:**
 
 ```bash
-# Backend
+# ── Backend ────────────────────────────────────────────────
 cd src/backend
 python -m venv .venv
-.venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-python scripts/generate_dataset.py
-python scripts/train_models.py  # optional ML training
-uvicorn app.main:app --reload
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
 
-# Frontend (separate terminal)
+pip install -r requirements.txt
+cp .env.example .env          # all defaults work for local dev
+python scripts/generate_dataset.py
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# ── Frontend (new terminal) ─────────────────────────────────
 cd src/frontend
 npm install
 npm run dev
 ```
 
-Open **http://localhost:5173** for the dashboard.
-API docs: **http://localhost:8000/api/docs**
+- Dashboard: **http://localhost:5173**
+- API docs (Swagger): **http://localhost:8000/api/docs**
+- Health check: **http://localhost:8000/api/health**
 
----
-
-## 🖥️ Demo
-
-| Artifact | Link |
-|---|---|
-| 📹 Demo Video | [See demo/demo-video-link.txt](demo/demo-video-link.txt) |
-| 🌐 Live Demo | [See demo/live-demo-url.txt](demo/live-demo-url.txt) |
-| 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
-| 📊 Presentation | [See presentation/](presentation/) |
+> The frontend communicates with the backend through the Vite dev-server proxy — no extra configuration is needed for local development.
 
 ---
 

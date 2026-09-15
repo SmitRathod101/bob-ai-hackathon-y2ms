@@ -1,20 +1,55 @@
-# Setup Guide
+# ChainMind AI — Local Setup Guide
 
-## Prerequisites
+> **ChainMind AI is not deployed.** Judges run it locally by following this guide.
+> Demo video: [https://youtu.be/yNumP-njqTQ](https://youtu.be/yNumP-njqTQ)
+
+---
+
+## A. Prerequisites
 
 Before you begin, ensure you have the following installed:
 
-- [x] Python 3.11+ (tested with Python 3.13)
-- [x] Node.js 18+ and npm
-- [x] Git
+| Tool | Required version |
+|---|---|
+| Python | 3.11 or newer (tested with 3.13) |
+| Node.js + npm | 18 or newer |
+| Git | any recent version |
 
-## Environment Variables
+---
+
+## B. Backend Setup
+
+### 1. Navigate to the backend directory
 
 ```bash
 cd src/backend
-cp .env.example .env
-# Edit .env if needed (all defaults work for local dev)
 ```
+
+### 2. Create and activate a virtual environment
+
+```bash
+python -m venv .venv
+
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
+```
+
+### 3. Install Python dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure environment variables
+
+```bash
+cp .env.example .env
+# All defaults work for local development — no edits required.
+```
+
+Key variables (all have safe defaults):
 
 | Variable | Description | Required | Default |
 |---|---|---|---|
@@ -25,129 +60,175 @@ cp .env.example .env
 | `WATSONX_PROJECT_ID` | watsonx project ID | Only if `watsonx` | — |
 | `WATSONX_URL` | watsonx endpoint URL | No | `https://us-south.ml.cloud.ibm.com` |
 
-> The application works fully without any LLM key. Template-based explanations are used as fallback.
+> The application works fully without any LLM key. Template-based explanations are used as a fallback.
 
-## Backend Installation
-
-```bash
-# 1. Navigate to backend directory
-cd src/backend
-
-# 2. Create virtual environment
-python -m venv .venv
-
-# 3. Activate virtual environment
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
-
-# 4. Install dependencies
-pip install -r requirements.txt
-```
-
-## Database Setup & Data Generation
+### 5. Generate the dataset and initialize the database
 
 ```bash
-# From src/backend directory (with venv active)
-
-# Generate the synthetic dataset (creates chainmind.db)
+# From src/backend (with venv active)
 python scripts/generate_dataset.py
-
-# Expected output:
-# [OK] Dataset generation complete!
-#    Ports:         8
-#    Warehouses:    12
-#    Routes:        48
-#    Shipments:     250
-#    Fleet assets:  95
-#    Weather events:2
-#    IoT readings:  500
 ```
 
-## ML Model Training (Optional)
+Expected output:
+```
+[OK] Dataset generation complete!
+   Ports:         8
+   Warehouses:    12
+   Routes:        48
+   Shipments:     250
+   Fleet assets:  95
+   Weather events:2
+   IoT readings:  500
+```
+
+This creates `src/backend/chainmind.db` (SQLite).
+
+### 6. ML Model Training (Optional)
+
+Pre-trained model files are already included in `src/backend/ml_models/`. You do **not** need to retrain them. If you want to retrain:
 
 ```bash
-# Train delay prediction and risk classification models
 python scripts/train_models.py
-
-# Expected output:
-#   Delay Model - MAE: ~1.7 hours  (synthetic data baseline)
-#   Risk Model - Accuracy: ~0.99  (synthetic data baseline)
+# Delay Model - MAE: ~1.7 hours
+# Risk Model  - Accuracy: ~0.99
 # Models saved to: ml_models/
 ```
 
-> The application works without trained models — deterministic fallback is always used if models are unavailable.
+> The application falls back to deterministic scoring if models are missing.
 
-## Running the Backend
+### 7. Start the backend server
 
 ```bash
-# From src/backend directory (with venv active)
+# From src/backend (with venv active)
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-The API will be available at:
-- **API Base**: `http://localhost:8000/api`
-- **API Docs (Swagger)**: `http://localhost:8000/api/docs`
-- **Health Check**: `http://localhost:8000/api/health`
+### 8. Verify the backend is running
 
-## Frontend Installation & Running
+Open **http://localhost:8000/api/health** in your browser, or:
 
 ```bash
-# In a new terminal
+curl http://localhost:8000/api/health
+```
+
+Expected response:
+```json
+{"status": "ok"}
+```
+
+You can also browse the full interactive API at **http://localhost:8000/api/docs**.
+
+---
+
+## C. Frontend Setup
+
+Open a **new terminal** (keep the backend running).
+
+### 1. Navigate to the frontend directory
+
+```bash
 cd src/frontend
+```
 
-# Install dependencies
+### 2. Install dependencies
+
+```bash
 npm install
+```
 
-# Start development server
+### 3. Environment variables (optional for local dev)
+
+The frontend ships with a `.env.example`:
+
+```bash
+cp .env.example .env
+# VITE_API_URL=http://localhost:8000/api  ← already the correct default
+```
+
+> For local development you do **not** need to create `.env` at all — see the next section.
+
+### 4. Start the frontend dev server
+
+```bash
 npm run dev
 ```
 
-The frontend will be available at: **http://localhost:5173**
+The dashboard is available at: **http://localhost:5173**
 
-## Running Tests
+### 5. Verify the frontend is working
+
+Open **http://localhost:5173**. You should see the ChainMind AI dashboard with:
+- 250 active shipments loaded
+- 8 ports shown on the map
+- Fleet status panel populated
+
+If the dashboard loads but shows no data, confirm the backend is running on port 8000.
+
+---
+
+## D. How the Frontend Connects to the Backend
+
+In local development the frontend **does not** make direct cross-origin requests to port 8000. Instead, Vite's built-in dev-server proxy (configured in `src/frontend/vite.config.ts`) forwards any request matching `/api/*` from `localhost:5173` to `localhost:8000`:
+
+```
+Browser → http://localhost:5173/api/...
+         ↓  (Vite proxy — same origin, no CORS issue)
+Backend → http://localhost:8000/api/...
+```
+
+This means:
+- No browser CORS error occurs.
+- No `.env` file or `VITE_API_URL` change is needed for local development.
+- As long as the backend is running on port 8000 before you start `npm run dev`, everything connects automatically.
+
+---
+
+## E. Running Tests
 
 ```bash
-# From src/backend directory (with venv active)
+# From src/backend (with venv active)
 python -m pytest tests/ -v
-
 # Expected: 22 passed
 ```
 
-## Quick Demo Flow
+---
 
-1. Open `http://localhost:5173`
-2. The Dashboard shows 250 active shipments, 8 ports, fleet status
-3. Click **"Simulate Crisis"** tab
-4. Select: Port Closure → Mumbai Port → 72 hours → High Severity
+## F. Local Demo Workflow
+
+### Mumbai Port 72-hour scenario
+
+1. Open **http://localhost:5173**
+2. The **Dashboard** tab shows 250 active shipments, 8 ports, fleet status
+3. Click the **"Simulate Crisis"** tab
+4. Select: **Port Closure** → **Mumbai Port** → **72 hours** → **High Severity**
 5. Click **"Run Crisis Simulation"**
-6. View impact: ~78 affected shipments, ~₹33 Cr exposed, ~245h avg delay
-7. See three recovery strategies with costs and risk levels
-8. View AI explanation and action plan
-9. Click **"Mumbai 120h"** preset to change duration
-10. Run again — results change (delay increases to ~409h)
-11. Go to **"What-If Compare"** to compare both scenarios side-by-side
+6. Review the impact: ~78 affected shipments, ~₹33 Cr exposed, ~245h avg delay
+7. See the three recovery strategies (Cost-Optimized, Speed-Optimized, AI-Recommended) with costs and risk levels
+8. Read the Explainable AI recommendation and action plan
 
-## Troubleshooting
+### Mumbai Port 120-hour scenario
+
+9. Click the **"Mumbai 120h"** preset (or manually set duration to 120 hours)
+10. Click **"Run Crisis Simulation"** again
+11. Compare results: delay increases to ~409h, cargo exposure rises
+12. Both scenarios are now in history
+
+### What-If Comparison
+
+13. Go to the **"What-If Compare"** tab
+14. Select the 72h and 120h runs side-by-side
+15. The charts show how the system responds to the longer disruption duration
+
+---
+
+## G. Troubleshooting
 
 | Issue | Solution |
 |---|---|
-| `ModuleNotFoundError` | Run `pip install -r requirements.txt` inside the `.venv` |
-| `chainmind.db not found` | Run `python scripts/generate_dataset.py` first |
-| Frontend can't connect to backend | Ensure backend is running on port 8000; check CORS settings in `.env` |
-| Map tiles not loading | Requires internet connection for CartoCDN tiles |
-| `sklearn not installed` | Run `pip install scikit-learn==1.5.2` separately |
-
-## Deployment
-
-### Backend (Render / Railway / Fly.io)
-
-1. Set environment variable `DATABASE_URL` to a PostgreSQL connection string
-2. Run `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-3. Run `python scripts/generate_dataset.py` as a one-time init command
-
-### Frontend (Vercel / Netlify)
-
-1. Set `VITE_API_URL` to your deployed backend URL
-2. Run `npm run build` — deploy the `dist/` directory
+| `ModuleNotFoundError` | Activate the venv first: `.venv\Scripts\activate` (Windows) or `source .venv/bin/activate` (macOS/Linux), then `pip install -r requirements.txt` |
+| `chainmind.db not found` | Run `python scripts/generate_dataset.py` from `src/backend` |
+| Frontend shows no data / "cannot connect" | Ensure backend is running on port 8000 before starting `npm run dev` |
+| CORS error in browser console | Confirm `CORS_ORIGINS` in `src/backend/.env` includes `http://localhost:5173` (it does by default) |
+| Map tiles not loading | Requires an internet connection for CartoCDN tiles |
+| `sklearn not installed` | Run `pip install scikit-learn==1.5.2` inside the active venv |
+| Backend starts but dataset is empty | Re-run `python scripts/generate_dataset.py` — it is safe to run multiple times |
