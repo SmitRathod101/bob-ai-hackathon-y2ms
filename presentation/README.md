@@ -1,30 +1,41 @@
-# Presentation
+# 📊 ChainMind AI Presentation
 
-Place your slide deck in this folder.
+This folder contains the presentation materials for:
 
-## Accepted Formats
+**ChainMind AI — Supply Chain Crisis Simulator**
 
-  slides.pdf      ← Preferred (universally viewable)
-  slides.pptx     ← Acceptable
-  slides.key      ← Acceptable (macOS Keynote)
+## 👥 Team
 
-Rename your file to `slides.pdf` (or `slides.pptx`) so the evaluation
-pipeline can locate it reliably.
+**Team Name:** Y2MS  
+**Track:** AI
 
-## Recommended Slide Structure (5–8 slides)
+**Team Members:**
+- Smitkumar Rathod
+- Yash Patel
+- Yaksh Patel
+- Mayur Kamariya
 
-  Slide 1: Title — Project name, team name, track
-  Slide 2: Problem — What problem? Who has it? Why does it matter?
-  Slide 3: Solution — What you built in one clear diagram or screenshot
-  Slide 4: Architecture — How the system works technically
-  Slide 5: Demo / Key Feature — Screenshot or flow of your best feature
-  Slide 6: IBM Technologies — Specifically how you used them
-  Slide 7: Results / Impact — What does success look like? Any metrics?
-  Slide 8: Team — Names, roles, what each person built
+## 📑 Presentation
 
-## Tips
+The final hackathon presentation is provided in this folder.
 
-- Keep slides visual — diagrams beat bullet points
-- One idea per slide
-- Font size minimum 24pt for readability
-- Do not paste large code blocks into slides — reference the repo instead
+The presentation covers:
+
+- Supply-chain crisis problem
+- ChainMind AI solution
+- Digital twin and network modeling
+- Crisis simulation
+- ML-based prediction and risk analysis
+- What-If scenario analysis
+- Optimization and decision support
+- Technical architecture
+- Key differentiators
+- Product demonstration
+
+## 🎯 Core Message
+
+ChainMind AI helps decision-makers move from:
+
+**Predict → Simulate → Compare → Optimize → Recover**
+
+rather than simply monitoring a disruption after it occurs.

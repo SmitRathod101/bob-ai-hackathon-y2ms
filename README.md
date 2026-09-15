@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Team Name** | ChainMind |
+| **Team Name** | Y2MS |
 | **Track** | AI |
-| **Team Lead** | Smit Rathod |
-| **IBM Bob** | Primary development agent |
+| **Team Lead** | Smitkumar Rathod |
+| **Team Members** | Smitkumar Rathod, Yash Patel, Yaksh Patel, Mayur Kamariya |
 
 ---
 

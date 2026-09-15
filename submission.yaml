@@ -3,18 +3,18 @@
 # =============================================================================
 
 team:
-  name: "ChainMind"
+  name: "y2ms"
   track: "AI"
   lead:
-    name: "Smit Rathod"
-    email: "smit.rathod@ibm.com"
+    name: "Smitkumar Rathod"
+    email: "24dce120@charusat.edu.in"
   members:
-    - name: "Smit Rathod"
-      email: "smit.rathod@ibm.com"
-    - name: ""
-      email: ""
-    - name: ""
-      email: ""
+    - name: "yash patel"
+      email: "24dce105@charusat.edu.in"
+    - name: "yaksh Patel"
+      email: "24dce104@charusat.edu.in"
+    - name: "Mayur kamariya"
+      email: "24it038@charusat.edu.in"
 
 submission:
   title: "ChainMind AI — Supply Chain Crisis Simulator"
