@@ -205,22 +205,21 @@ async def _call_watsonx(prompt: str) -> Optional[str]:
     """Call IBM watsonx.ai API for explanation generation."""
     try:
         import httpx
-        # Get IAM token
-        token_response = httpx.post(
-            "https://iam.cloud.ibm.com/identity/token",
-            data={
-                "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
-                "apikey": settings.watsonx_api_key,
-            },
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-            timeout=15.0,
-        )
-        token_response.raise_for_status()
-        iam_token = token_response.json()["access_token"]
-
         model = settings.llm_model if settings.llm_model != "gpt-4o-mini" else "ibm/granite-13b-instruct-v2"
 
         async with httpx.AsyncClient(timeout=30.0) as client:
+            # Get IAM token (async — does not block event loop)
+            token_response = await client.post(
+                "https://iam.cloud.ibm.com/identity/token",
+                data={
+                    "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
+                    "apikey": settings.watsonx_api_key,
+                },
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+            )
+            token_response.raise_for_status()
+            iam_token = token_response.json()["access_token"]
+
             response = await client.post(
                 f"{settings.watsonx_url}/ml/v1/text/generation?version=2023-05-29",
                 headers={

@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.database.models import (
     NetworkConnection, Route, Shipment, Port, Warehouse,
-    SimulationRun, AutoModeRun,
+    SimulationRun, SimulationResult, AutoModeRun,
 )
 from app.simulation.auto_mode_controller import get_auto_controller
 
