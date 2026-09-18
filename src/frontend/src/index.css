@@ -112,3 +112,43 @@ body {
   border: 1px solid #334155 !important;
   color: #e2e8f0 !important;
 }
+
+/* ── Prompt 3: Digital Twin UI polish ─────────────────────────────────────── */
+
+/* Smooth glow transitions for status indicators */
+.status-glow-green { box-shadow: 0 0 8px rgba(34, 197, 94, 0.3); }
+.status-glow-red   { box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
+.status-glow-amber { box-shadow: 0 0 8px rgba(245, 158, 11, 0.3); }
+
+/* Animate SVG truck dots smoothly */
+svg circle {
+  transition: r 0.15s ease, fill 0.3s ease;
+}
+
+/* Card hover enhancement */
+.card:hover {
+  border-color: #334155;
+}
+
+/* Digital Twin SVG canvas */
+.digital-twin-canvas {
+  background: #060f1e;
+}
+
+/* Narrative point animation */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.narrative-point {
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+/* Delta card */
+.delta-worse { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.05); }
+.delta-same  { border-color: rgba(100,116,139,0.4); }
+
+/* Ensure bg-slate-750 works */
+.bg-slate-750 { background-color: #1e2a3a; }
+

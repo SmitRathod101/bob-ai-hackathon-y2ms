@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import type { Port, SimulationResult, SimulationRequest, FleetVehicle } from '../services/api';
 import { runSimulation } from '../services/api';
 import { formatCurrency, formatDelay, disruption_label } from '../utils/format';
-import SupplyChainMap from './SupplyChainMap';
+import DigitalTwin from './DigitalTwin';
 import ImpactSummaryPanel from './ImpactSummaryPanel';
 import StrategyCards from './StrategyCards';
 import ExplainableAI from './ExplainableAI';
@@ -301,18 +301,18 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
           </div>
         </div>
 
-        {/* ── Map ──────────────────────────────────────────── */}
+        {/* ── Digital Twin ──────────────────────────────────── */}
         <div className="lg:col-span-2">
-          <SupplyChainMap
-            ports={ports}
-            disruptedPortIds={result ? [form.location] : []}
+          <DigitalTwin
+            refreshTrigger={result ? Date.now() : 0}
             disruptedRouteIds={result?.disrupted_route_ids ?? []}
-            simulationResult={result}
+            activeLocation={result?.scenario?.location ?? form.location}
+            compact={true}
           />
           {/* Run hint when no result */}
           {!result && !loading && (
             <div className="mt-3 text-center text-xs text-slate-500">
-              Configure a scenario and click <strong className="text-slate-400">Run Crisis Simulation</strong> to see disruption impact on the map
+              Configure a scenario and click <strong className="text-slate-400">Run Crisis Simulation</strong> to see disruption impact on the digital twin
             </div>
           )}
           {loading && (
@@ -391,7 +391,22 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
 
           {/* ⑦ Explainable AI */}
           {result.explanation && (
-            <ExplainableAI explanation={result.explanation} />
+            <ExplainableAI
+              explanation={result.explanation}
+              simulationContext={{
+                disruption_type: result.scenario?.disruption_type,
+                location: result.scenario?.location,
+                severity: result.scenario?.severity,
+                duration_hours: result.scenario?.duration_hours,
+                total_affected_shipments: result.impact_summary?.total_affected_shipments,
+                average_delay_hours: result.impact_summary?.average_delay_hours,
+                cold_chain_at_risk: result.impact_summary?.cold_chain_at_risk,
+                high_priority_affected: result.impact_summary?.high_priority_affected,
+                disrupted_routes: result.impact_summary?.disrupted_routes,
+                recommended_strategy: result.recommended_strategy?.strategy_type,
+                strategy_name: result.recommended_strategy?.name,
+              }}
+            />
           )}
 
           {/* ⑧ Top risk shipments table */}

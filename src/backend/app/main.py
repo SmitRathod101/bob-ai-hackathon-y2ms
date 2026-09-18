@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config.settings import settings
 from app.database.session import init_db
 from app.ml.predict import load_models
-from app.api import health, dashboard, ports, warehouses, routes, shipments, fleet, simulate, scenarios, manual, auto
+from app.api import health, dashboard, ports, warehouses, routes, shipments, fleet, simulate, scenarios, manual, auto, twin
 
 logging.basicConfig(
     level=logging.INFO,
@@ -63,6 +63,7 @@ app.include_router(simulate.router, prefix="/api", tags=["Simulation"])
 app.include_router(scenarios.router, prefix="/api", tags=["Scenarios"])
 app.include_router(manual.router, prefix="/api", tags=["Manual Mode"])
 app.include_router(auto.router, prefix="/api", tags=["Auto Mode"])
+app.include_router(twin.router, prefix="/api", tags=["Digital Twin"])
 
 
 @app.get("/", include_in_schema=False)

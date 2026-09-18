@@ -11,6 +11,7 @@ import {
   type AutoModeRunSummary,
   type AutoScenario,
 } from '../services/api';
+import DigitalTwin from './DigitalTwin';
 
 // ── Phase display helpers ──────────────────────────────────────────────────────
 
@@ -479,6 +480,12 @@ export default function AutoModeTab() {
           )}
         </div>
       </div>
+
+      {/* Digital Twin — reflects autonomous crisis detection */}
+      <DigitalTwin
+        refreshTrigger={status?.total_cycles ?? 0}
+        activeLocation={status?.location}
+      />
 
       {/* ── Session History ─────────────────────────────────────────────────── */}
       <div className="card">

@@ -237,10 +237,57 @@ export default function WhatIfTab() {
             {result.comparison.delay_increase_pct > 0 && (
               <p className="text-sm text-slate-300">
                 Worst-case scenario causes <strong className="text-red-400">{result.comparison.delay_increase_pct}%</strong> more
-                delay than best-case scenario — {result.comparison.scenario_labels[result.comparison.best_scenario_idx]} is least severe.
+                delay than best-case scenario — <strong className="text-green-400">{result.comparison.scenario_labels[result.comparison.best_scenario_idx]}</strong> is least severe.
               </p>
             )}
           </div>
+
+          {/* Quick delta summary cards (best vs worst) */}
+          {result.scenarios.length >= 2 && (() => {
+            const best = result.scenarios[result.comparison.best_scenario_idx];
+            const worst = result.scenarios[result.comparison.worst_scenario_idx];
+            const bestLabel = result.comparison.scenario_labels[result.comparison.best_scenario_idx];
+            const worstLabel = result.comparison.scenario_labels[result.comparison.worst_scenario_idx];
+            const delayDelta = worst.impact_summary.average_delay_hours - best.impact_summary.average_delay_hours;
+            const shipmentDelta = worst.impact_summary.total_affected_shipments - best.impact_summary.total_affected_shipments;
+            const valueDelta = worst.impact_summary.total_cargo_value_exposed - best.impact_summary.total_cargo_value_exposed;
+            return (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <WhatIfDeltaCard
+                  label="Delay Impact"
+                  best={`${best.impact_summary.average_delay_hours.toFixed(1)}h`}
+                  worst={`${worst.impact_summary.average_delay_hours.toFixed(1)}h`}
+                  delta={`+${delayDelta.toFixed(1)}h`}
+                  worstLabel={worstLabel}
+                  bestLabel={bestLabel}
+                />
+                <WhatIfDeltaCard
+                  label="Affected Shipments"
+                  best={best.impact_summary.total_affected_shipments.toString()}
+                  worst={worst.impact_summary.total_affected_shipments.toString()}
+                  delta={`+${shipmentDelta}`}
+                  worstLabel={worstLabel}
+                  bestLabel={bestLabel}
+                />
+                <WhatIfDeltaCard
+                  label="Cargo at Risk"
+                  best={formatCurrency(best.impact_summary.total_cargo_value_exposed)}
+                  worst={formatCurrency(worst.impact_summary.total_cargo_value_exposed)}
+                  delta={valueDelta > 0 ? `+${formatCurrency(valueDelta)}` : '='}
+                  worstLabel={worstLabel}
+                  bestLabel={bestLabel}
+                />
+                <WhatIfDeltaCard
+                  label="Cold-Chain at Risk"
+                  best={best.impact_summary.cold_chain_at_risk.toString()}
+                  worst={worst.impact_summary.cold_chain_at_risk.toString()}
+                  delta={`+${worst.impact_summary.cold_chain_at_risk - best.impact_summary.cold_chain_at_risk}`}
+                  worstLabel={worstLabel}
+                  bestLabel={bestLabel}
+                />
+              </div>
+            );
+          })()}
 
           {/* Delta diff table (only for exactly 2 scenarios) */}
           {result.scenarios.length === 2 && (
@@ -612,6 +659,42 @@ function MetricLine({ label, value, highlight }: { label: string; value: string;
     <div className="flex justify-between items-center text-sm">
       <span className="text-slate-400 text-xs">{label}</span>
       <span className={`font-medium text-xs ${highlight ? 'text-orange-300' : 'text-white'}`}>{value}</span>
+    </div>
+  );
+}
+
+// ── What-If Delta Summary Card ─────────────────────────────────────────────────
+function WhatIfDeltaCard({
+  label, best, worst, delta, bestLabel, worstLabel,
+}: {
+  label: string;
+  best: string;
+  worst: string;
+  delta: string;
+  bestLabel: string;
+  worstLabel: string;
+}) {
+  const isNoChange = delta === '+0' || delta === '+0h' || delta === '=';
+  return (
+    <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+      <div className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">{label}</div>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-green-400 truncate max-w-20" title={bestLabel}>Best</span>
+          <span className="text-sm font-bold text-green-400">{best}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-red-400 truncate max-w-20" title={worstLabel}>Worst</span>
+          <span className="text-sm font-bold text-red-400">{worst}</span>
+        </div>
+        <div className={`text-center py-1 rounded-lg text-xs font-bold mt-1 ${
+          isNoChange
+            ? 'bg-slate-700 text-slate-400'
+            : 'bg-red-900/30 border border-red-700/50 text-red-300'
+        }`}>
+          {isNoChange ? 'No difference' : `Delta: ${delta}`}
+        </div>
+      </div>
     </div>
   );
 }

@@ -15,6 +15,7 @@ import ExplainableAI from './ExplainableAI';
 import ColdChainPanel from './ColdChainPanel';
 import FleetAvailabilityPanel from './FleetAvailabilityPanel';
 import AffectedRoutesPanel from './AffectedRoutesPanel';
+import DigitalTwin from './DigitalTwin';
 import { formatCurrency, formatDelay } from '../utils/format';
 import type { FleetVehicle } from '../services/api';
 
@@ -698,6 +699,13 @@ export default function ManualModeTab() {
       {result && (
         <div ref={resultsRef} className="space-y-6">
 
+          {/* Digital Twin — shows crisis state from this simulation */}
+          <DigitalTwin
+            refreshTrigger={result ? 1 : 0}
+            disruptedRouteIds={result.disrupted_route_ids ?? []}
+            activeLocation={result.scenario?.location}
+          />
+
           {/* Impact header */}
           <div className="bg-red-900/20 border border-red-700/60 rounded-xl p-5">
             <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -746,7 +754,24 @@ export default function ManualModeTab() {
           <StrategyCards strategies={result.strategies ?? []} />
 
           {/* AI explanation */}
-          {result.explanation && <ExplainableAI explanation={result.explanation} />}
+          {result.explanation && (
+            <ExplainableAI
+              explanation={result.explanation}
+              simulationContext={{
+                disruption_type: result.scenario?.disruption_type,
+                location: result.scenario?.location,
+                severity: result.scenario?.severity,
+                duration_hours: result.scenario?.duration_hours,
+                total_affected_shipments: result.impact_summary?.total_affected_shipments,
+                average_delay_hours: result.impact_summary?.average_delay_hours,
+                cold_chain_at_risk: result.impact_summary?.cold_chain_at_risk,
+                high_priority_affected: result.impact_summary?.high_priority_affected,
+                disrupted_routes: result.impact_summary?.disrupted_routes,
+                recommended_strategy: result.recommended_strategy?.strategy_type,
+                strategy_name: result.recommended_strategy?.name,
+              }}
+            />
+          )}
 
           {/* Event timeline */}
           {result.simulation_events && result.simulation_events.length > 0 && (

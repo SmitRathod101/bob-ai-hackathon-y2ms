@@ -525,3 +525,90 @@ export const getAutoRunDetail = (runId: string) =>
 
 export const getAutoScenarios = (): Promise<{ scenarios: AutoScenario[]; locations: string[] }> =>
   api.get('/auto/scenarios').then(r => r.data);
+
+// ── Digital Twin State ────────────────────────────────────────────────────────
+
+export interface TwinNode {
+  id: string
+  name: string
+  city: string
+  lat: number
+  lon: number
+  type: 'port' | 'city' | 'warehouse'
+  congestion: number
+  status: string
+  risk_score: number | null
+}
+
+export interface TwinConnection {
+  id: string
+  name: string
+  from: string
+  to: string
+  mode: string
+  distance_km: number
+  status: 'available' | 'degraded' | 'unavailable'
+  disruption_reason: string | null
+  route_id: string | null
+  is_alternative: boolean
+}
+
+export interface TwinShipment {
+  id: string
+  origin: string
+  destination: string
+  status: string
+  progress_pct: number
+  risk_score: number
+  risk_level: 'low' | 'medium' | 'high' | 'critical'
+  delay_hours: number
+  temperature_sensitive: boolean
+  priority: number
+  cargo_type: string | null
+  is_affected: boolean
+}
+
+export interface TwinSimState {
+  active: boolean
+  simulation_id?: string
+  location?: string
+  disruption_type?: string
+  severity?: string
+  strategy?: string
+  affected_shipments?: number
+  average_delay_hours?: number
+  disrupted_route_ids?: string[]
+  alternative_route_ids?: string[]
+  created_at?: string
+}
+
+export interface TwinAutoState {
+  status: string
+  phase: string
+  location: string
+  total_cycles: number
+  crises_detected: number
+  current_conditions: Record<string, unknown> | null
+}
+
+export interface TwinState {
+  nodes: TwinNode[]
+  connections: TwinConnection[]
+  shipments: TwinShipment[]
+  simulation: TwinSimState
+  auto_mode: TwinAutoState
+  network_health: 'normal' | 'warning' | 'crisis' | 'recovery' | 'recovered'
+  stats: {
+    total_nodes: number
+    total_connections: number
+    disrupted_connections: number
+    degraded_connections: number
+    total_shipments: number
+    delayed_shipments: number
+    critical_shipments: number
+    alternative_routes_active: number
+  }
+}
+
+export const getTwinState = (): Promise<TwinState> =>
+  api.get('/twin/state').then(r => r.data)
