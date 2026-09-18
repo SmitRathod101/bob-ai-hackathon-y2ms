@@ -1,3 +1,4 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings
 from typing import Optional, List
 import os
@@ -8,13 +9,26 @@ class Settings(BaseSettings):
     app_name: str = "ChainMind AI"
     app_version: str = "1.0.0"
     app_env: str = "development"
-    debug: bool = True
+    debug: bool = False
 
     # Database
     database_url: str = "sqlite:///./chainmind.db"
 
-    # CORS
-    cors_origins: List[str] = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
+    # CORS — set CORS_ORIGINS as a comma-separated string in production, e.g.:
+    # CORS_ORIGINS=https://your-app.vercel.app,https://your-app-git-branch.vercel.app
+    # Localhost origins are always included for local development.
+    cors_origins: str = Field(
+        default="",
+        alias="CORS_ORIGINS",
+        description="Comma-separated extra origins to allow (production). Localhost always included.",
+    )
+
+    def get_cors_origins(self) -> List[str]:
+        base = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
+        if self.cors_origins:
+            extras = [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+            return base + extras
+        return base
 
     # LLM Configuration
     llm_provider: str = "none"  # "openai", "watsonx", "none"

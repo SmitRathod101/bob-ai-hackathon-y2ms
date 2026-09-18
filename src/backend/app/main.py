@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config.settings import settings
-from app.database.session import init_db
+from app.database.session import init_db, SessionLocal
 from app.ml.predict import load_models
 from app.api import health, dashboard, ports, warehouses, routes, shipments, fleet, simulate, scenarios, manual, auto, twin
 
@@ -22,11 +22,45 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _seed_if_empty():
+    """Seed the database with the synthetic dataset if it has not been seeded yet.
+
+    Called at startup so Render deployments work without a manual seeding step.
+    Safe to call multiple times — only seeds when the ports table is empty.
+    """
+    from app.database.models import Port
+    db = SessionLocal()
+    try:
+        count = db.query(Port).count()
+    except Exception as exc:
+        # Tables may not exist yet (edge case before init_db); log and continue.
+        logger.warning(f"Could not query Port table during seed check: {exc}")
+        return
+    finally:
+        db.close()
+
+    if count == 0:
+        logger.info("Database is empty — running initial dataset seed...")
+        try:
+            from scripts.generate_dataset import seed_database
+            seed_database()
+            logger.info("✅ Dataset seed complete")
+        except Exception as exc:
+            # Seeding failed on an empty database — this is a hard startup error.
+            # Re-raise so Render marks the deployment as failed rather than serving
+            # an empty database that appears healthy.
+            logger.error(f"❌ Dataset seed failed on empty database: {exc}")
+            raise RuntimeError(f"Startup seeding failed: {exc}") from exc
+    else:
+        logger.info(f"Database already seeded ({count} ports found) — skipping seed")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown events."""
     logger.info("🚀 ChainMind AI starting up...")
     init_db()
+    _seed_if_empty()
     load_models()
     logger.info("✅ Database initialized and ML models loaded")
     yield
@@ -45,7 +79,7 @@ app = FastAPI(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=settings.get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

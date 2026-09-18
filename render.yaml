@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: chainmind-api
+    runtime: python
+    region: oregon
+    rootDir: src/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///./chainmind.db
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: LLM_PROVIDER
+        value: none
+      - key: ML_MODELS_DIR
+        value: ml_models
+      # Add CORS_ORIGINS after you know your Vercel frontend URL, e.g.:
+      # CORS_ORIGINS=https://chainmind-ai.vercel.app
+      - key: CORS_ORIGINS
+        sync: false        # set manually in Render dashboard after Vercel deploy
+      # Optional LLM (set in Render dashboard — never commit secrets):
+      # - key: LLM_API_KEY
+      #   sync: false
+      # - key: WATSONX_API_KEY
+      #   sync: false
+      # - key: WATSONX_PROJECT_ID
+      #   sync: false
