@@ -5,9 +5,10 @@ import SimulationTab from './components/SimulationTab';
 import WhatIfTab from './components/WhatIfTab';
 import HistoryTab from './components/HistoryTab';
 import ManualModeTab from './components/ManualModeTab';
+import AutoModeTab from './components/AutoModeTab';
 import { getDashboardSummary, type DashboardSummary } from './services/api';
 
-type Tab = 'dashboard' | 'simulate' | 'whatif' | 'history' | 'manual';
+type Tab = 'dashboard' | 'simulate' | 'whatif' | 'history' | 'manual' | 'auto';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
@@ -74,6 +75,9 @@ export default function App() {
         )}
         {activeTab === 'manual' && (
           <ManualModeTab />
+        )}
+        {activeTab === 'auto' && (
+          <AutoModeTab />
         )}
       </main>
 

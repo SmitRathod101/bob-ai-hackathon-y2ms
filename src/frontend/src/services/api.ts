@@ -434,3 +434,94 @@ export const getManualHistoryDetail = (simId: string) =>
 
 export const getSimulationEvents = (simId: string) =>
   api.get(`/manual/events/${simId}`).then(r => r.data);
+
+// ── Round 2: Auto Mode Types ───────────────────────────────────────────────────
+
+export interface AutoStartRequest {
+  location: string;
+  scenario: string;
+  cycle_interval_seconds: number;
+  max_cycles?: number | null;
+}
+
+export interface AutoStatusResponse {
+  run_id: string | null;
+  status: string;           // idle / running / paused
+  phase: string;            // idle / monitoring / condition_change / detection / ...
+  location: string;
+  scenario: string;
+  cycle_interval_seconds: number;
+  max_cycles: number | null;
+  total_cycles: number;
+  crises_detected: number;
+  started_at: string | null;
+  paused_at: string | null;
+  current_conditions: Record<string, unknown> | null;
+  last_outcome: AutoCycleOutcome | null;
+  last_error: string | null;
+}
+
+export interface AutoCycleOutcome {
+  cycle: number;
+  simulation_id?: string;
+  location: string;
+  conditions: Record<string, unknown>;
+  crises_detected: number;
+  disruption_types: string[];
+  affected_shipments: number;
+  recommended_strategy: string | null;
+  strategy_count: number;
+  timestamp: string;
+}
+
+export interface AutoModeRunSummary {
+  run_id: string;
+  status: string;
+  phase: string;
+  monitored_location: string | null;
+  cycle_interval_seconds: number;
+  max_cycles: number | null;
+  total_cycles: number;
+  total_crises_detected: number;
+  started_at: string | null;
+  stopped_at: string | null;
+  last_cycle_at: string | null;
+  last_outcome: AutoCycleOutcome | null;
+  last_error: string | null;
+  created_at: string | null;
+}
+
+export interface AutoScenario {
+  name: string;
+  description: string;
+  steps: number;
+}
+
+// ── Round 2: Auto Mode API Calls ───────────────────────────────────────────────
+
+export const startAutoMode = (request: AutoStartRequest): Promise<AutoStatusResponse> =>
+  api.post('/auto/start', request).then(r => r.data);
+
+export const pauseAutoMode = (): Promise<AutoStatusResponse> =>
+  api.post('/auto/pause').then(r => r.data);
+
+export const resumeAutoMode = (): Promise<AutoStatusResponse> =>
+  api.post('/auto/resume').then(r => r.data);
+
+export const stopAutoMode = (): Promise<AutoStatusResponse> =>
+  api.post('/auto/stop').then(r => r.data);
+
+export const getAutoStatus = (): Promise<AutoStatusResponse> =>
+  api.get('/auto/status').then(r => r.data);
+
+export const getAutoHistory = (limit = 50) =>
+  api.get('/auto/history', { params: { limit } }).then(r => r.data);
+
+export const getAutoRuns = (limit = 20): Promise<{ runs: AutoModeRunSummary[]; total: number }> =>
+  api.get('/auto/runs', { params: { limit } }).then(r => r.data);
+
+export const getAutoRunDetail = (runId: string) =>
+  api.get(`/auto/runs/${runId}`).then(r => r.data);
+
+export const getAutoScenarios = (): Promise<{ scenarios: AutoScenario[]; locations: string[] }> =>
+  api.get('/auto/scenarios').then(r => r.data);

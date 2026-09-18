@@ -1,6 +1,6 @@
-import { Activity, Zap, GitCompare, Clock, Settings } from 'lucide-react';
+import { Activity, Zap, GitCompare, Clock, Settings, Bot } from 'lucide-react';
 
-type Tab = 'dashboard' | 'simulate' | 'whatif' | 'history' | 'manual';
+type Tab = 'dashboard' | 'simulate' | 'whatif' | 'history' | 'manual' | 'auto';
 
 interface HeaderProps {
   activeTab: Tab;
@@ -13,6 +13,7 @@ export default function Header({ activeTab, onTabChange, backendStatus }: Header
     { id: 'dashboard', label: 'Dashboard', icon: <Activity className="w-4 h-4" /> },
     { id: 'simulate', label: 'Simulate Crisis', icon: <Zap className="w-4 h-4" /> },
     { id: 'manual', label: 'Manual Mode', icon: <Settings className="w-4 h-4" /> },
+    { id: 'auto', label: 'Auto Mode', icon: <Bot className="w-4 h-4" /> },
     { id: 'whatif', label: 'What-If Compare', icon: <GitCompare className="w-4 h-4" /> },
     { id: 'history', label: 'History', icon: <Clock className="w-4 h-4" /> },
   ];

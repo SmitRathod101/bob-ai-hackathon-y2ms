@@ -28,6 +28,27 @@ class EventStage(str, enum.Enum):
     recovery_started = "recovery_started"
     recovery_completed = "recovery_completed"
     outcome_recorded = "outcome_recorded"
+    # Auto Mode specific stages
+    monitoring_started = "monitoring_started"
+    monitoring_resumed = "monitoring_resumed"
+    cycle_started = "cycle_started"
+    cycle_completed = "cycle_completed"
+    cycle_failed = "cycle_failed"
+    auto_paused = "auto_paused"
+    auto_stopped = "auto_stopped"
+
+
+class AutoModePhase(str, enum.Enum):
+    """Phases in the Auto Mode autonomous lifecycle."""
+    idle = "idle"
+    monitoring = "monitoring"
+    condition_change = "condition_change"
+    detection = "detection"
+    analysis = "analysis"
+    simulation = "simulation"
+    recovery = "recovery"
+    explanation = "explanation"
+    recording = "recording"
 
 
 class ConnectionStatus(str, enum.Enum):
@@ -436,3 +457,42 @@ class SimulationEvent(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     simulation = relationship("SimulationRun", back_populates="events")
+
+
+# ── Round 2: Auto Mode Table ──────────────────────────────────────────────────
+
+class AutoModeRun(Base):
+    """
+    Tracks a single autonomous Auto Mode session (start → stop).
+    Multiple simulation cycles may occur within one AutoModeRun.
+    """
+    __tablename__ = "auto_mode_runs"
+
+    run_id = Column(String, primary_key=True)
+    # Lifecycle
+    status = Column(String, default="idle")          # idle/monitoring/paused/stopped/error
+    phase = Column(String, default="idle")           # current AutoModePhase
+    started_at = Column(DateTime, nullable=True)
+    paused_at = Column(DateTime, nullable=True)
+    stopped_at = Column(DateTime, nullable=True)
+    last_cycle_at = Column(DateTime, nullable=True)
+    next_cycle_at = Column(DateTime, nullable=True)
+    # Configuration
+    monitored_location = Column(String, nullable=True)  # primary location being monitored
+    cycle_interval_seconds = Column(Integer, default=30)
+    max_cycles = Column(Integer, nullable=True)         # None = unlimited
+    # Statistics
+    total_cycles = Column(Integer, default=0)
+    total_crises_detected = Column(Integer, default=0)
+    total_recoveries = Column(Integer, default=0)
+    # Current / latest cycle info
+    current_simulation_id = Column(String, ForeignKey("simulation_runs.simulation_id"), nullable=True)
+    latest_crisis_severity = Column(String, nullable=True)
+    # Condition snapshot (JSON)
+    current_conditions_json = Column(Text, nullable=True)  # current operational baseline
+    # Recovery outcome from last crisis cycle (JSON summary)
+    last_outcome_json = Column(Text, nullable=True)
+    # Error info
+    last_error = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
