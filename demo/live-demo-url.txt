@@ -1,1 +1,8 @@
-NOT DEPLOYED — run locally using docs/setup-guide.md
+https://bob-ai-hackathon-y2ms.vercel.app
+
+ChainMind AI — Supply Chain Crisis Simulator
+IBM Bobathon 2025
+
+Backend API:  https://chainmind-api.onrender.com
+API Docs:     https://chainmind-api.onrender.com/api/docs
+Health Check: https://chainmind-api.onrender.com/api/health

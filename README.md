@@ -70,7 +70,7 @@ src/
       llm/          # LLM explainer (OpenAI/watsonx/template)
       config/       # Settings
     scripts/        # generate_dataset.py, train_models.py
-    tests/          # 22 backend tests
+    tests/          # 130 backend tests (130 passed, 1 skipped)
     requirements.txt
   frontend/
     src/
@@ -91,8 +91,9 @@ submission.yaml
 | Artifact | Link |
 |---|---|
 | 📹 Demo Video | [https://youtu.be/yNumP-njqTQ](https://youtu.be/yNumP-njqTQ) |
-| 🌐 Live Demo (Frontend) | *(set after Vercel deployment — see [`docs/deployment-guide.md`](docs/deployment-guide.md))* |
-| 🔌 Backend API | *(set after Render deployment — see [`docs/deployment-guide.md`](docs/deployment-guide.md))* |
+| 🌐 Live Demo (Frontend) | [https://bob-ai-hackathon-y2ms.vercel.app](https://bob-ai-hackathon-y2ms.vercel.app) |
+| 🔌 Backend API | [https://chainmind-api.onrender.com](https://chainmind-api.onrender.com) |
+| 📖 API Docs (Swagger) | [https://chainmind-api.onrender.com/api/docs](https://chainmind-api.onrender.com/api/docs) |
 | 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
 | 📊 Presentation | [See presentation/](presentation/) |
 
@@ -158,7 +159,7 @@ IBM Bob was the primary development agent for ChainMind AI:
 - **Dataset generation**: Synthetic India logistics data generator
 - **ML pipeline**: Feature engineering, RandomForest/GradientBoosting training scripts
 - **Frontend**: React dashboard, Recharts visualizations, Leaflet map
-- **Testing**: 22 backend tests covering all simulation scenarios
+- **Testing**: 130 backend tests covering all simulation scenarios (130 passed, 1 skipped)
 - **Documentation**: All docs written with Bob
 
 ---

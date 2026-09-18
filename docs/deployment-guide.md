@@ -30,7 +30,7 @@ Browser → Vercel (React/Vite SPA)
 1. Go to [https://dashboard.render.com](https://dashboard.render.com)
 2. Click **New +** → **Web Service**
 3. Connect your GitHub account if not already connected
-4. Select the repository: `bob-ai-hackathon-chainmind` (or your fork)
+4. Select the repository: `bob-ai-hackathon-y2ms` (or your fork)
 5. Select branch: **`round2`**
 
 ### Step 2 — Configure the service
@@ -77,7 +77,7 @@ Once the deploy shows **Live**, check:
 
 ```
 https://<your-render-service>.onrender.com/api/health
-# Expected: {"status": "ok"}
+# Expected: {"status": "healthy", ...}
 
 https://<your-render-service>.onrender.com/api/docs
 # Expected: Swagger UI
@@ -92,7 +92,7 @@ Note your Render URL — you will need it in Part 2.
 ### Step 1 — Connect repository
 
 1. Go to [https://vercel.com/new](https://vercel.com/new)
-2. Import the GitHub repository: `bob-ai-hackathon-chainmind`
+2. Import the GitHub repository: `bob-ai-hackathon-y2ms`
 3. Select branch: **`round2`**
 
 ### Step 2 — Configure project settings
@@ -156,7 +156,7 @@ Once both are live, verify the following from the **public** Vercel URL:
 | Digital Twin | Network map animates |
 | What-If Compare | Side-by-side scenario comparison |
 | No CORS errors | Browser console is clean |
-| Backend health | `/api/health` returns `{"status": "ok"}` |
+| Backend health | `/api/health` returns `{"status": "healthy", ...}` |
 
 ---
 
@@ -185,10 +185,10 @@ Once both are live, verify the following from the **public** Vercel URL:
 
 | Service | URL |
 |---|---|
-| **Frontend (Vercel)** | *(set after deployment)* |
-| **Backend API (Render)** | *(set after deployment)* |
-| **API Docs (Swagger)** | `<backend-url>/api/docs` |
-| **Health Check** | `<backend-url>/api/health` |
+| **Frontend (Vercel)** | https://bob-ai-hackathon-y2ms.vercel.app |
+| **Backend API (Render)** | https://chainmind-api.onrender.com |
+| **API Docs (Swagger)** | https://chainmind-api.onrender.com/api/docs |
+| **Health Check** | https://chainmind-api.onrender.com/api/health |
 
 ---
 

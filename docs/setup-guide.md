@@ -1,6 +1,6 @@
 # ChainMind AI — Local Setup Guide
 
-> **ChainMind AI is not deployed.** Judges run it locally by following this guide.
+> **Live demo:** [https://bob-ai-hackathon-y2ms.vercel.app](https://bob-ai-hackathon-y2ms.vercel.app) — or run locally by following this guide.
 > Demo video: [https://youtu.be/yNumP-njqTQ](https://youtu.be/yNumP-njqTQ)
 
 ---
@@ -113,7 +113,7 @@ curl http://localhost:8000/api/health
 
 Expected response:
 ```json
-{"status": "ok"}
+{"status": "healthy", "service": "ChainMind AI", "version": "1.0.0", "ml_models": {...}}
 ```
 
 You can also browse the full interactive API at **http://localhost:8000/api/docs**.
@@ -188,7 +188,7 @@ This means:
 ```bash
 # From src/backend (with venv active)
 python -m pytest tests/ -v
-# Expected: 22 passed
+# Expected: 130 passed, 1 skipped
 ```
 
 ---
