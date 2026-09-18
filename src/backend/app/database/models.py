@@ -9,6 +9,34 @@ import enum
 Base = declarative_base()
 
 
+# ── Round 2: Extended Enums ───────────────────────────────────────────────────
+
+class SimulationMode(str, enum.Enum):
+    """Simulation trigger mode."""
+    scenario = "scenario"   # Round 1 — traditional scenario form
+    manual = "manual"       # Round 2 — judge-driven Manual Mode
+
+
+class EventStage(str, enum.Enum):
+    """Stages in the simulation event lifecycle."""
+    condition_changed = "condition_changed"
+    disruption_detected = "disruption_detected"
+    impact_analyzed = "impact_analyzed"
+    risk_predicted = "risk_predicted"
+    strategy_generated = "strategy_generated"
+    decision_made = "decision_made"
+    recovery_started = "recovery_started"
+    recovery_completed = "recovery_completed"
+    outcome_recorded = "outcome_recorded"
+
+
+class ConnectionStatus(str, enum.Enum):
+    """Status of a network connection/edge."""
+    available = "available"
+    degraded = "degraded"
+    unavailable = "unavailable"
+
+
 class OperationalStatus(str, enum.Enum):
     operational = "operational"
     disrupted = "disrupted"
@@ -239,10 +267,16 @@ class SimulationRun(Base):
     high_priority_affected = Column(Integer, default=0)
     cold_chain_at_risk = Column(Integer, default=0)
     recommended_strategy = Column(String, nullable=True)
+    # ── Round 2 additions ─────────────────────────────────────────────────────
+    mode = Column(String, default="scenario")     # "scenario" or "manual"
+    source_events_json = Column(Text, nullable=True)  # JSON list of input events/conditions
+    run_label = Column(String, nullable=True)         # optional human label for history
     created_at = Column(DateTime, default=datetime.utcnow)
 
     results = relationship("SimulationResult", back_populates="simulation")
     strategies = relationship("RecoveryStrategy", back_populates="simulation")
+    events = relationship("SimulationEvent", back_populates="simulation",
+                          order_by="SimulationEvent.sequence")
 
 
 class SimulationResult(Base):
@@ -288,3 +322,117 @@ class RecoveryStrategy(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     simulation = relationship("SimulationRun", back_populates="strategies")
+
+
+# ── Round 2: New Tables ───────────────────────────────────────────────────────
+
+class NetworkConnection(Base):
+    """
+    An explicit edge in the logistics network between two named nodes.
+    Used by Manual Mode to interrupt specific connections.
+    """
+    __tablename__ = "network_connections"
+
+    connection_id = Column(String, primary_key=True)
+    name = Column(String)
+    from_node = Column(String, nullable=False)
+    to_node = Column(String, nullable=False)
+    transport_mode = Column(String, default="truck")
+    distance_km = Column(Float, default=0.0)
+    normal_time_hours = Column(Float, default=0.0)
+    status = Column(String, default="available")  # available / degraded / unavailable
+    disruption_reason = Column(String, nullable=True)
+    disrupted_at = Column(DateTime, nullable=True)
+    restored_at = Column(DateTime, nullable=True)
+    # Link to the route record this connection corresponds to (if any)
+    route_id = Column(String, ForeignKey("routes.route_id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Disruptions caused by this connection interruption
+    disruptions = relationship("DirectDisruption", back_populates="connection")
+
+
+class ConditionState(Base):
+    """
+    Environmental / operational condition readings for a region/node.
+    Used by the Causal Engine to derive disruptions.
+    """
+    __tablename__ = "condition_states"
+
+    condition_id = Column(String, primary_key=True)
+    scope_type = Column(String, nullable=False)   # region / node / route / area
+    scope_name = Column(String, nullable=False)   # e.g. "Mumbai", "Western Coast"
+    # Environmental conditions (None = not set / using baseline)
+    rainfall_mm = Column(Float, nullable=True)       # mm/hour
+    humidity_pct = Column(Float, nullable=True)      # 0–100
+    temperature_c = Column(Float, nullable=True)     # °C
+    traffic_level = Column(Float, nullable=True)     # 0.0–1.0 (fraction of max)
+    road_condition = Column(Float, nullable=True)    # 0.0–1.0 (1=perfect, 0=impassable)
+    port_congestion = Column(Float, nullable=True)   # 0.0–1.0
+    weather_severity = Column(Float, nullable=True)  # 0.0–1.0
+    wind_speed_kmh = Column(Float, nullable=True)
+    visibility_km = Column(Float, nullable=True)
+    # Status
+    is_active = Column(Boolean, default=True)
+    simulation_id = Column(String, ForeignKey("simulation_runs.simulation_id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class DirectDisruption(Base):
+    """
+    A direct disruption event entered by a judge in Manual Mode.
+    Distinct from the legacy Disruption model (which is scenario-form based).
+    """
+    __tablename__ = "direct_disruptions"
+
+    disruption_id = Column(String, primary_key=True)
+    # Disruption classification
+    disruption_type = Column(String, nullable=False)
+    # e.g. landslide, flood, road_blockage, bridge_failure, port_closure,
+    #      severe_weather_event, vehicle_breakdown, cold_chain_failure,
+    #      connection_interruption
+    scope_type = Column(String, nullable=False)    # connection / node / route / region
+    scope_name = Column(String, nullable=False)    # name of affected entity
+    severity = Column(String, default="medium")    # low / medium / high
+    severity_score = Column(Float, default=0.5)
+    # Lifecycle
+    is_active = Column(Boolean, default=True)
+    started_at = Column(DateTime, default=datetime.utcnow)
+    ended_at = Column(DateTime, nullable=True)
+    # Causal info
+    causal_source = Column(String, nullable=True)  # "manual" / "causal_engine" / condition_id
+    causal_reason = Column(Text, nullable=True)    # Human-readable causal explanation
+    # Link to optional connection
+    connection_id = Column(String, ForeignKey("network_connections.connection_id"), nullable=True)
+    # Simulation association
+    simulation_id = Column(String, ForeignKey("simulation_runs.simulation_id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    connection = relationship("NetworkConnection", back_populates="disruptions")
+
+
+class SimulationEvent(Base):
+    """
+    Structured event record for the Crisis Operations Timeline.
+
+    Each simulation run produces a sequence of events describing:
+    conditions → disruptions → impact → strategies → decisions.
+    """
+    __tablename__ = "simulation_events"
+
+    event_id = Column(String, primary_key=True)
+    simulation_id = Column(String, ForeignKey("simulation_runs.simulation_id"), nullable=False)
+    sequence = Column(Integer, default=0)         # ordering within run
+    stage = Column(String, nullable=False)        # EventStage value
+    event_type = Column(String, nullable=False)   # condition_changed / disruption_detected / etc.
+    severity = Column(String, nullable=True)
+    affected_entity = Column(String, nullable=True)   # node / connection / route name
+    affected_scope = Column(String, nullable=True)    # region / node / route / connection
+    causal_source = Column(String, nullable=True)     # what triggered this event
+    summary = Column(Text, nullable=True)             # human-readable one-liner
+    payload_json = Column(Text, nullable=True)        # full structured data as JSON
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    simulation = relationship("SimulationRun", back_populates="events")

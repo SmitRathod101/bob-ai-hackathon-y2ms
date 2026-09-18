@@ -4,9 +4,10 @@ import DashboardTab from './components/DashboardTab';
 import SimulationTab from './components/SimulationTab';
 import WhatIfTab from './components/WhatIfTab';
 import HistoryTab from './components/HistoryTab';
+import ManualModeTab from './components/ManualModeTab';
 import { getDashboardSummary, type DashboardSummary } from './services/api';
 
-type Tab = 'dashboard' | 'simulate' | 'whatif' | 'history';
+type Tab = 'dashboard' | 'simulate' | 'whatif' | 'history' | 'manual';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
@@ -70,6 +71,9 @@ export default function App() {
         )}
         {activeTab === 'history' && (
           <HistoryTab recentSimulations={dashboardData?.recent_simulations ?? []} />
+        )}
+        {activeTab === 'manual' && (
+          <ManualModeTab />
         )}
       </main>
 

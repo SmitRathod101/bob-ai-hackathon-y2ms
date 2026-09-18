@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config.settings import settings
 from app.database.session import init_db
 from app.ml.predict import load_models
-from app.api import health, dashboard, ports, warehouses, routes, shipments, fleet, simulate, scenarios
+from app.api import health, dashboard, ports, warehouses, routes, shipments, fleet, simulate, scenarios, manual
 
 logging.basicConfig(
     level=logging.INFO,
@@ -61,6 +61,7 @@ app.include_router(shipments.router, prefix="/api", tags=["Shipments"])
 app.include_router(fleet.router, prefix="/api", tags=["Fleet"])
 app.include_router(simulate.router, prefix="/api", tags=["Simulation"])
 app.include_router(scenarios.router, prefix="/api", tags=["Scenarios"])
+app.include_router(manual.router, prefix="/api", tags=["Manual Mode"])
 
 
 @app.get("/", include_in_schema=False)

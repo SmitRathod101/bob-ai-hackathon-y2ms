@@ -282,3 +282,155 @@ export const getColdChain = (simId: string) =>
 
 export const getWarehouses = () =>
   api.get('/warehouses').then(r => r.data);
+
+
+// ── Round 2: Manual Mode Types ────────────────────────────────────────────────
+
+export interface ConditionInput {
+  scope_type: string;
+  scope_name: string;
+  rainfall_mm?: number;
+  humidity_pct?: number;
+  temperature_c?: number;
+  traffic_level?: number;
+  road_condition?: number;
+  port_congestion?: number;
+  weather_severity?: number;
+  wind_speed_kmh?: number;
+  visibility_km?: number;
+}
+
+export interface DirectDisruptionInput {
+  disruption_type: string;
+  scope_type: string;
+  scope_name: string;
+  severity: string;
+  duration_hours: number;
+  capacity_reduction: number;
+  causal_reason?: string;
+  connection_id?: string;
+}
+
+export interface ManualSimulationRequest {
+  conditions: ConditionInput[];
+  direct_disruptions: DirectDisruptionInput[];
+  interrupt_connection_ids: string[];
+  run_label?: string;
+  include_explanation?: boolean;
+}
+
+export interface ConnectionRecord {
+  connection_id: string;
+  name?: string;
+  from_node: string;
+  to_node: string;
+  transport_mode: string;
+  distance_km: number;
+  normal_time_hours: number;
+  status: string;  // available / degraded / unavailable
+  disruption_reason?: string;
+  route_id?: string;
+  disrupted_at?: string;
+  restored_at?: string;
+}
+
+export interface CausalViolation {
+  condition: string;
+  scope: string;
+  value: number;
+  threshold: number;
+  severity: string;
+  consequence: string;
+}
+
+export interface CausalGeneratedDisruption {
+  disruption_type: string;
+  scope_name: string;
+  severity: string;
+  causal_reason: string;
+  duration_hours: number;
+  capacity_reduction: number;
+}
+
+export interface CausalInfo {
+  violations: CausalViolation[];
+  generated_disruptions: CausalGeneratedDisruption[];
+  causal_narrative: string;
+  event_log: Array<Record<string, unknown>>;
+}
+
+export interface SimulationEventRecord {
+  event_id: string;
+  sequence: number;
+  stage: string;
+  event_type: string;
+  severity?: string;
+  affected_entity?: string;
+  summary?: string;
+  timestamp?: string;
+}
+
+export interface ConnectionImpact {
+  connection: ConnectionRecord;
+  affected_route_count: number;
+  affected_shipment_count: number;
+  affected_route_ids: string[];
+  affected_shipment_ids: string[];
+}
+
+export interface ManualSimResult extends SimulationResult {
+  manual_mode?: boolean;
+  run_label?: string;
+  causal_info?: CausalInfo;
+  connection_impact?: Record<string, ConnectionImpact>;
+  simulation_events?: SimulationEventRecord[];
+}
+
+export interface ManualRunSummary {
+  simulation_id: string;
+  run_label?: string;
+  mode: string;
+  scenario_name?: string;
+  disruption_type?: string;
+  location?: string;
+  duration_hours?: number;
+  severity?: string;
+  total_affected_shipments?: number;
+  total_cargo_value_exposed?: number;
+  average_delay_hours?: number;
+  recommended_strategy?: string;
+  status?: string;
+  created_at?: string;
+  source_conditions_count: number;
+  source_disruptions_count: number;
+  interrupted_connections: string[];
+}
+
+// ── Round 2: Manual Mode API Calls ────────────────────────────────────────────
+
+export const runManualSimulation = (request: ManualSimulationRequest): Promise<ManualSimResult> =>
+  api.post('/manual/simulate', request).then(r => r.data);
+
+export const getConnections = (status?: string): Promise<ConnectionRecord[]> =>
+  api.get('/manual/connections', { params: status ? { status } : {} }).then(r => r.data);
+
+export const getConnectionById = (id: string): Promise<ConnectionRecord> =>
+  api.get(`/manual/connections/${id}`).then(r => r.data);
+
+export const interruptConnection = (id: string, reason: string, severity = 'high') =>
+  api.post(`/manual/connections/${id}/interrupt`, { reason, severity }).then(r => r.data);
+
+export const restoreConnection = (id: string) =>
+  api.post(`/manual/connections/${id}/restore`).then(r => r.data);
+
+export const getNodes = (): Promise<{ nodes: string[]; count: number }> =>
+  api.get('/manual/nodes').then(r => r.data);
+
+export const getManualHistory = (limit = 50): Promise<ManualRunSummary[]> =>
+  api.get('/manual/history', { params: { limit } }).then(r => r.data);
+
+export const getManualHistoryDetail = (simId: string) =>
+  api.get(`/manual/history/${simId}`).then(r => r.data);
+
+export const getSimulationEvents = (simId: string) =>
+  api.get(`/manual/events/${simId}`).then(r => r.data);
