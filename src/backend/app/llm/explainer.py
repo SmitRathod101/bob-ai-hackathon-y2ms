@@ -250,7 +250,16 @@ async def generate_explanation(simulation_result: Dict[str, Any]) -> Dict[str, A
     """
     Generate AI explanation for the recommended strategy.
     Falls back to template if no LLM is configured or LLM call fails.
+
+    When no shipments are affected (strategies=[]), returns a safe zero-impact
+    explanation so the API response is always structurally valid.
     """
+    # Guard: if there are no strategies (0 affected shipments), return a safe
+    # explanation stub rather than crashing inside template/basis builders.
+    strategies = simulation_result.get("strategies", [])
+    if not strategies:
+        return _zero_impact_explanation(simulation_result)
+
     explanation_text = None
     used_llm = False
     llm_provider = settings.llm_provider.lower()
@@ -283,17 +292,65 @@ async def generate_explanation(simulation_result: Dict[str, Any]) -> Dict[str, A
     }
 
 
+def _zero_impact_explanation(simulation_result: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Return a structurally complete explanation object for zero-impact simulations.
+    Used when no shipments were affected and no strategies were generated.
+    """
+    scenario = simulation_result.get("scenario", {})
+    location = scenario.get("location", "the affected area")
+    dtype = scenario.get("disruption_type", "disruption").replace("_", " ")
+    return {
+        "explanation": (
+            f"ChainMind analyzed the {dtype} at {location}. "
+            f"No active shipments were found on the affected routes at this time, "
+            f"so no recovery strategies are required. The network is unaffected for current cargo."
+        ),
+        "crisis_summary": (
+            f"**Crisis Assessment: LOW IMPACT**\n\n"
+            f"A {dtype} at {location} was simulated. "
+            f"No active shipments are currently using the affected routes or nodes. "
+            f"No recovery action is required."
+        ),
+        "used_llm": False,
+        "llm_provider": "template",
+        "explanation_basis": {
+            "cost_reasoning": {
+                "value": 0, "vs_cheapest": 0, "vs_fastest": 0,
+                "label": "No recovery cost — no affected shipments",
+            },
+            "delay_reasoning": {
+                "value": 0, "vs_cheapest": 0, "vs_fastest": 0,
+                "label": "No delay — no affected shipments",
+            },
+            "risk_reasoning": {
+                "level": "low", "cold_chain_risk": 0.0, "cold_chain_count": 0,
+                "label": "No risk — no affected shipments",
+            },
+            "cargo_reasoning": {
+                "total_value": 0, "high_priority": 0,
+                "label": "No cargo exposed",
+            },
+            "fleet_reasoning": {
+                "vehicles_required": 0,
+                "available": simulation_result.get("fleet_summary", {}).get("available_vehicles", 0),
+                "label": "No fleet redeployment required",
+            },
+        },
+    }
+
+
 def _build_explanation_basis(simulation_result: Dict[str, Any]) -> Dict[str, Any]:
     """Build the structured basis for the explanation (for the explainable AI section)."""
     impact = simulation_result.get("impact_summary", {})
-    rec = simulation_result.get("recommended_strategy", {})
+    rec = simulation_result.get("recommended_strategy") or {}
     strategies = simulation_result.get("strategies", [])
 
-    cheapest = next((s for s in strategies if s["strategy_type"] == "cheapest"), {})
-    fastest = next((s for s in strategies if s["strategy_type"] == "fastest"), {})
-    balanced = next((s for s in strategies if s["strategy_type"] == "balanced"), {})
+    cheapest = next((s for s in strategies if s.get("strategy_type") == "cheapest"), {})
+    fastest = next((s for s in strategies if s.get("strategy_type") == "fastest"), {})
+    balanced = next((s for s in strategies if s.get("strategy_type") == "balanced"), {})
     rec_type = rec.get("strategy_type", "balanced")
-    rec_strategy = next((s for s in strategies if s["strategy_type"] == rec_type), balanced)
+    rec_strategy = next((s for s in strategies if s.get("strategy_type") == rec_type), balanced)
 
     return {
         "cost_reasoning": {

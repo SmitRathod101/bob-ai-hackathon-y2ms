@@ -137,10 +137,41 @@ async def manual_simulate(
     The Causal Engine converts conditions into disruptions.
     Results come from the existing simulation pipeline.
     """
-    if not request.conditions and not request.direct_disruptions and not request.interrupt_connection_ids:
+    # Ensure connections are bootstrapped so provided IDs will resolve
+    bootstrap_connections_from_routes(db)
+
+    # Validate that any provided connection IDs actually exist in the DB
+    # (avoids silent failures and confusing 0-impact results)
+    valid_conn_ids = []
+    invalid_conn_ids = []
+    for conn_id in request.interrupt_connection_ids:
+        conn = get_connection(db, conn_id)
+        if conn:
+            valid_conn_ids.append(conn_id)
+        else:
+            invalid_conn_ids.append(conn_id)
+            logger.warning(f"Connection ID {conn_id!r} not found in DB — skipping")
+
+    if invalid_conn_ids:
+        logger.warning(
+            f"Skipped {len(invalid_conn_ids)} unknown connection IDs: {invalid_conn_ids}. "
+            f"Using {len(valid_conn_ids)} valid connections."
+        )
+
+    # Require at least one meaningful input
+    has_conditions = bool([c for c in request.conditions if c.scope_name])
+    has_disruptions = bool([d for d in request.direct_disruptions if d.scope_name])
+    has_connections = bool(valid_conn_ids)
+
+    if not has_conditions and not has_disruptions and not has_connections:
         raise HTTPException(
             status_code=400,
-            detail="Provide at least one condition, one direct disruption, or one connection to interrupt.",
+            detail=(
+                "Provide at least one condition with a scope_name, "
+                "one direct disruption with a scope_name, "
+                "or one valid connection ID to interrupt. "
+                f"Connection IDs not found: {invalid_conn_ids or 'none provided'}."
+            ),
         )
 
     conditions = [c.model_dump(exclude_none=True) for c in request.conditions]
@@ -151,23 +182,35 @@ async def manual_simulate(
             db=db,
             conditions=conditions,
             direct_disruptions=disruptions,
-            interrupt_connection_ids=request.interrupt_connection_ids,
+            interrupt_connection_ids=valid_conn_ids,
             run_label=request.run_label,
         )
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        logger.error(f"Manual simulation error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Simulation failed: {e}")
 
-    # Generate LLM explanation if requested
+    # Generate LLM explanation — always produce a structurally complete response
     if request.include_explanation:
         try:
             explanation = await generate_explanation(result)
             result["explanation"] = explanation
         except Exception as e:
-            logger.error(f"Explanation generation failed: {e}")
+            logger.error(f"Explanation generation failed: {e}", exc_info=True)
+            # Return a safe complete fallback — never leave explanation_basis missing
             result["explanation"] = {
-                "explanation": "Explanation unavailable",
+                "explanation": "AI explanation unavailable for this run.",
+                "crisis_summary": "Explanation generation failed. Simulation results above are valid.",
                 "used_llm": False,
                 "llm_provider": "none",
+                "explanation_basis": {
+                    "cost_reasoning": {"value": 0, "vs_cheapest": 0, "vs_fastest": 0, "label": "Unavailable"},
+                    "delay_reasoning": {"value": 0, "vs_cheapest": 0, "vs_fastest": 0, "label": "Unavailable"},
+                    "risk_reasoning": {"level": "unknown", "cold_chain_risk": 0, "cold_chain_count": 0, "label": "Unavailable"},
+                    "cargo_reasoning": {"total_value": 0, "high_priority": 0, "label": "Unavailable"},
+                    "fleet_reasoning": {"vehicles_required": 0, "available": 0, "label": "Unavailable"},
+                },
             }
 
     return result

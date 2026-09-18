@@ -381,7 +381,7 @@ class TestConnectionInterruption:
 
         dd = db.query(DirectDisruption).filter(
             DirectDisruption.connection_id == conn_id,
-        ).first()
+        ).order_by(DirectDisruption.created_at.desc()).first()
         assert dd is not None
         assert dd.disruption_type == "connection_interruption"
         assert dd.is_active is True

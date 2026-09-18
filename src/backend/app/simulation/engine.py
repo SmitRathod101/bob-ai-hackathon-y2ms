@@ -68,6 +68,9 @@ def run_simulation(db: Session, scenario: Dict[str, Any]) -> Dict[str, Any]:
         delay_multiplier: float (optional override)
         cost_multiplier: float (optional override)
         temperature_risk_multiplier: float
+        # Round 2 Manual Mode additions (optional):
+        _extra_disrupted_route_ids: list[str]   — route IDs already known to be disrupted
+        _extra_disrupted_nodes: list[str]        — node names to additionally exclude from graph
     """
     sim_id = str(uuid.uuid4())
     started_at = datetime.utcnow()
@@ -84,43 +87,80 @@ def run_simulation(db: Session, scenario: Dict[str, Any]) -> Dict[str, Any]:
     cost_mult = float(scenario.get("cost_multiplier", REROUTE_COST_FACTOR[severity]))
     temp_risk_mult = float(scenario.get("temperature_risk_multiplier", 1.0 + severity_score * 0.5))
 
+    # ── Round 2: Pre-seeded route/node lists from Manual Mode ─────────────────
+    # Manual Mode may pass already-identified disrupted routes/nodes so the
+    # engine does not need to re-discover them from a location string.
+    extra_route_ids: List[str] = list(scenario.get("_extra_disrupted_route_ids") or [])
+    extra_nodes: List[str] = list(scenario.get("_extra_disrupted_nodes") or [])
+
     # ── Step 1: Determine affected nodes ─────────────────────────────────────
     # For port closures, find all routes connected to that port
     # For route closures, find the specific route
     # For warehouse disruptions, find routes to/from that warehouse
-    disrupted_nodes = []
-    disrupted_route_ids = []
+    disrupted_nodes: List[str] = list(extra_nodes)
+    disrupted_route_ids: List[str] = list(extra_route_ids)
 
     if disruption_type == "port_closure":
         # Clean the location name for matching
         port_name = _normalize_location(location)
-        disrupted_nodes = [port_name]
-        disrupted_route_ids = get_affected_routes_for_port(db, port_name)
+        if port_name not in disrupted_nodes:
+            disrupted_nodes.append(port_name)
+        for rid in get_affected_routes_for_port(db, port_name):
+            if rid not in disrupted_route_ids:
+                disrupted_route_ids.append(rid)
         logger.info(f"[{sim_id}] Port closure: {port_name}, affected routes: {len(disrupted_route_ids)}")
 
     elif disruption_type == "route_closure":
         route = db.query(Route).filter(
             Route.name.ilike(f"%{location}%")
         ).first()
-        if route:
-            disrupted_route_ids = [route.route_id]
+        if route and route.route_id not in disrupted_route_ids:
+            disrupted_route_ids.append(route.route_id)
 
     elif disruption_type == "warehouse_disruption":
         warehouse_name = _normalize_location(location)
-        disrupted_nodes = [warehouse_name]
-        disrupted_route_ids = get_affected_routes_for_port(db, warehouse_name)
+        if warehouse_name not in disrupted_nodes:
+            disrupted_nodes.append(warehouse_name)
+        for rid in get_affected_routes_for_port(db, warehouse_name):
+            if rid not in disrupted_route_ids:
+                disrupted_route_ids.append(rid)
 
     elif disruption_type == "severe_weather":
         # Weather affects a region — disrupt nearby routes (simplified)
         weather_city = _normalize_location(location)
-        disrupted_nodes = [weather_city]
-        disrupted_route_ids = get_affected_routes_for_port(db, weather_city)
+        if weather_city not in disrupted_nodes:
+            disrupted_nodes.append(weather_city)
+        for rid in get_affected_routes_for_port(db, weather_city):
+            if rid not in disrupted_route_ids:
+                disrupted_route_ids.append(rid)
 
     elif disruption_type in ("strike", "demand_spike", "fuel_price_increase", "vehicle_shortage"):
         # These affect all routes from/to the location
         loc_name = _normalize_location(location)
-        disrupted_nodes = [loc_name]
-        disrupted_route_ids = get_affected_routes_for_port(db, loc_name)
+        if loc_name not in disrupted_nodes:
+            disrupted_nodes.append(loc_name)
+        for rid in get_affected_routes_for_port(db, loc_name):
+            if rid not in disrupted_route_ids:
+                disrupted_route_ids.append(rid)
+
+    elif disruption_type in (
+        "connection_interruption", "landslide", "flood", "road_blockage",
+        "bridge_failure", "severe_weather_event", "vehicle_breakdown",
+        "cold_chain_failure",
+    ):
+        # Round 2 Manual Mode disruption types that work via pre-seeded route IDs.
+        # If no extra_route_ids were given, fall back to location-based lookup.
+        if not disrupted_route_ids:
+            loc_name = _normalize_location(location)
+            if loc_name not in disrupted_nodes:
+                disrupted_nodes.append(loc_name)
+            for rid in get_affected_routes_for_port(db, loc_name):
+                if rid not in disrupted_route_ids:
+                    disrupted_route_ids.append(rid)
+        logger.info(
+            f"[{sim_id}] {disruption_type}: {len(disrupted_route_ids)} pre-seeded routes, "
+            f"nodes: {disrupted_nodes}"
+        )
 
     # ── Step 2: Find directly affected shipments ──────────────────────────────
     directly_affected = []

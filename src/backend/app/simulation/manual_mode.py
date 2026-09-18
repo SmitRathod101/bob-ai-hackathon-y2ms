@@ -118,21 +118,30 @@ def run_manual_simulation(
     causal_result: CausalEngineResult = run_causal_engine(conditions, direct_disruptions)
 
     if not causal_result.merged_scenario:
-        # No conditions or disruptions → run with a minimal placeholder scenario
+        # No conditions or disruptions — but connections may have been interrupted.
+        # Use the from_node of the first interrupted connection as the location.
+        best_loc = _best_location_from_connections(db, interrupt_connection_ids) or \
+                   _best_location(conditions, direct_disruptions)
         causal_result.merged_scenario = {
-            "disruption_type": "severe_weather",
-            "location": _best_location(conditions, direct_disruptions),
-            "duration_hours": 6.0,
-            "severity": "low",
-            "capacity_reduction": 0.1,
+            "disruption_type": "connection_interruption",
+            "location": best_loc,
+            "duration_hours": 24.0,
+            "severity": "high",
+            "capacity_reduction": 1.0,
         }
 
     scenario = causal_result.merged_scenario
-    # ── Step 4: Run the existing simulation engine ───────────────────────────
-    # The existing engine uses build_logistics_graph(db, exclude_nodes=...)
-    # We temporarily patch exclude_nodes with both causal + interrupted nodes.
+
+    # ── Step 4: Build pre-seeded route + node lists from connection interruptions
+    # These are passed directly into run_simulation() so the engine correctly
+    # identifies affected shipments even when the disruption type is not one of
+    # the existing Round 1 types (port_closure, route_closure, etc.).
+    combined_route_ids = list(dict.fromkeys(all_interrupted_route_ids))  # dedup, preserve order
     excluded_nodes = list(set(causal_result.excluded_nodes))
-    scenario["_excluded_nodes"] = excluded_nodes  # passed through to engine if needed
+
+    # Inject pre-seeded data into the scenario dict
+    scenario["_extra_disrupted_route_ids"] = combined_route_ids
+    scenario["_extra_disrupted_nodes"] = excluded_nodes
 
     sim_result = run_simulation(db, scenario)
 
@@ -461,6 +470,24 @@ def _best_location(
         if d.get("location"):
             return d["location"]
     return "Mumbai"
+
+
+
+def _best_location_from_connections(
+    db: Session,
+    connection_ids: List[str],
+) -> Optional[str]:
+    """Return the from_node of the first interrupted connection, if any."""
+    if not connection_ids:
+        return None
+    from app.database.models import NetworkConnection
+    conn = db.query(NetworkConnection).filter(
+        NetworkConnection.connection_id.in_(connection_ids)
+    ).first()
+    if conn:
+        return conn.from_node or conn.to_node
+    return None
+
 
 
 def _score_to_severity(count: int) -> str:
