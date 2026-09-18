@@ -91,7 +91,8 @@ submission.yaml
 | Artifact | Link |
 |---|---|
 | 📹 Demo Video | [https://youtu.be/yNumP-njqTQ](https://youtu.be/yNumP-njqTQ) |
-| 🌐 Live Demo | **NOT DEPLOYED** — run locally using [`docs/setup-guide.md`](docs/setup-guide.md) |
+| 🌐 Live Demo (Frontend) | *(set after Vercel deployment — see [`docs/deployment-guide.md`](docs/deployment-guide.md))* |
+| 🔌 Backend API | *(set after Render deployment — see [`docs/deployment-guide.md`](docs/deployment-guide.md))* |
 | 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
 | 📊 Presentation | [See presentation/](presentation/) |
 
@@ -99,7 +100,7 @@ submission.yaml
 
 ## ⚡ Run Locally
 
-ChainMind AI is not deployed. Run it locally by following **[`docs/setup-guide.md`](docs/setup-guide.md)** — it covers prerequisites, all installation steps, environment variables, database setup, verification, the demo workflow, and troubleshooting.
+Run locally by following **[`docs/setup-guide.md`](docs/setup-guide.md)** — it covers prerequisites, all installation steps, environment variables, database setup, verification, the demo workflow, and troubleshooting.
 
 **Quick-start summary:**
 
