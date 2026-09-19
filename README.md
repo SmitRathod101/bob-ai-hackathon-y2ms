@@ -1,179 +1,286 @@
-# ChainMind AI — Supply Chain Crisis Simulator
+# ChainMind AI
 
-> **IBM Bobathon 2025 | Track: AI**
+## AI-Powered Supply Chain Control Center
 
----
+ChainMind AI is an intelligent supply-chain control center designed to help operations teams monitor logistics networks, detect disruptions, understand their impact, and make faster response decisions.
 
-## 👥 Team
-
-| Field | Value |
-|---|---|
-| **Team Name** | Y2MS |
-| **Track** | AI |
-| **Team Lead** | Smitkumar Rathod |
-| **Team Members** | Smitkumar Rathod, Yash Patel, Yaksh Patel, Mayur Kamariya |
+The system combines a live network view, shipment and route intelligence, disruption detection, AI-assisted analysis, crisis simulation, and what-if analysis into a single operational interface.
 
 ---
 
-## 🎯 Problem Statement
+## 🚨 Problem
 
-Supply chain operators currently have visibility into **what is happening now**, but lack tools to simulate **what would happen if** a disruption occurred. When a critical port, route, or warehouse fails, operators must react manually — without data-driven recovery strategies, cost estimates, or risk analysis. Billions in cargo value is exposed to avoidable delays.
+Modern supply chains are highly interconnected. A disruption at a port, route, warehouse, or shipment can quickly propagate across the network.
 
----
+Operations teams need to answer questions such as:
 
-## 💡 Solution
+- What is happening in the network right now?
+- Which shipments and routes are at risk?
+- What will be affected if a disruption occurs?
+- How severe is the impact?
+- What response options are available?
+- How will the network behave under a simulated crisis?
 
-ChainMind AI is a **Supply Chain Digital Twin + What-If Crisis Simulator**. It models a real logistics network (India-focused, 250+ shipments, 48 routes, 8 ports, 95 fleet assets) and allows operators to simulate any disruption scenario:
-
-> "What happens if Mumbai Port is closed for 72 hours at high severity?"
-
-The system dynamically calculates cascading impact, scores risk per shipment, evaluates cold-chain exposure, finds alternative routes using graph algorithms, and recommends the optimal recovery strategy — all from real simulation, not hardcoded results.
-
----
-
-## ✨ Key Features
-
-- **What-If Crisis Simulator**: Run port closures, weather events, strikes, and more — results are dynamically calculated from the digital twin
-- **Cascading Impact Engine**: Identifies directly and indirectly affected shipments through graph traversal
-- **Three Recovery Strategies**: Cost-Optimized, Speed-Optimized, and AI-Recommended (Balanced) — all scored with a transparent multi-factor algorithm
-- **Cold-Chain Risk Analysis**: Temperature-sensitive shipments (vaccines, pharmaceuticals, fresh produce) tracked with deviation scoring
-- **Explainable AI**: Every recommendation includes factor-by-factor explanation; LLM-enhanced if configured, template-based fallback always available
-- **What-If Comparison**: Compare up to 5 scenarios side-by-side (e.g., 72h vs 120h closure) with visual charts
+Traditional monitoring systems often provide data without connecting detection, investigation, analysis, and response into one workflow.
 
 ---
 
-## 🛠️ Tech Stack
+## 💡 Our Solution
 
-| Category | Technologies |
-|---|---|
-| **Languages** | Python 3.13, TypeScript |
-| **Backend** | FastAPI, SQLAlchemy, NetworkX, scikit-learn |
-| **Frontend** | React 19, Vite 8, Recharts, React-Leaflet |
-| **Database** | SQLite (dev) / PostgreSQL-ready |
-| **ML** | RandomForestRegressor (delay), GradientBoostingClassifier (risk) |
-| **IBM Technologies** | IBM Bob (primary development agent throughout) |
-| **Other** | Tailwind CSS 3, Lucide Icons, Axios |
+**ChainMind AI** provides a unified control-center experience following the operational workflow:
 
----
+> **MONITOR → INVESTIGATE → ANALYZE → DECIDE → ACT**
 
-## 📁 Repository Structure
+### Monitor
+View the overall health of the supply-chain network through operational KPIs, shipments, routes, ports, fleet status, and active risks.
 
-```
-src/
-  backend/
-    app/
-      api/          # FastAPI endpoints
-      database/     # SQLAlchemy models + session
-      simulation/   # Core simulation engine + risk scorer
-      optimization/ # Route optimizer (NetworkX) + fleet optimizer
-      ml/           # ML predict + features
-      llm/          # LLM explainer (OpenAI/watsonx/template)
-      config/       # Settings
-    scripts/        # generate_dataset.py, train_models.py
-    tests/          # 130 backend tests (130 passed, 1 skipped)
-    requirements.txt
-  frontend/
-    src/
-      components/   # Dashboard, Simulation, WhatIf, History tabs
-      charts/       # Recharts components
-      services/     # API client
-      utils/        # Format helpers
-docs/
-demo/
-presentation/
-submission.yaml
-```
+### Investigate
+Select shipments, routes, disruptions, and network elements to inspect their operational details and understand what is happening.
+
+### Analyze
+Use AI-assisted analysis to understand disruption impact, affected network elements, and potential response considerations.
+
+### Decide
+Review available information and AI-assisted recommendations before taking an operational decision.
+
+### Act
+Use supported simulation and operational workflows to evaluate or execute the available response actions.
 
 ---
 
-## 🖥️ Demo
+# 🚀 Key Features
 
-| Artifact | Link |
-|---|---|
-| 📹 Demo Video | [https://youtu.be/yNumP-njqTQ](https://youtu.be/yNumP-njqTQ) |
-| 🌐 Live Demo (Frontend) | [https://bob-ai-hackathon-y2ms.vercel.app](https://bob-ai-hackathon-y2ms.vercel.app) |
-| 🔌 Backend API | [https://chainmind-api.onrender.com](https://chainmind-api.onrender.com) |
-| 📖 API Docs (Swagger) | [https://chainmind-api.onrender.com/api/docs](https://chainmind-api.onrender.com/api/docs) |
-| 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
-| 📊 Presentation | [See presentation/](presentation/) |
+## 1. Operations Control Center
 
----
+The Overview dashboard provides a centralized view of the supply-chain network.
 
-## ⚡ Run Locally
+It includes:
 
-Run locally by following **[`docs/setup-guide.md`](docs/setup-guide.md)** — it covers prerequisites, all installation steps, environment variables, database setup, verification, the demo workflow, and troubleshooting.
-
-**Quick-start summary:**
-
-```bash
-# ── Backend ────────────────────────────────────────────────
-cd src/backend
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
-
-pip install -r requirements.txt
-cp .env.example .env          # all defaults work for local dev
-python scripts/generate_dataset.py
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-# ── Frontend (new terminal) ─────────────────────────────────
-cd src/frontend
-npm install
-npm run dev
-```
-
-- Dashboard: **http://localhost:5173**
-- API docs (Swagger): **http://localhost:8000/api/docs**
-- Health check: **http://localhost:8000/api/health**
-
-> The frontend communicates with the backend through the Vite dev-server proxy — no extra configuration is needed for local development.
+- Network health
+- Active risks
+- Shipment status
+- Port network
+- Fleet status
+- Active disruptions
+- Digital Twin network visualization
+- Operational KPIs
 
 ---
 
-## 🔑 Environment Variables
+## 2. Digital Twin
 
-```bash
-cp src/backend/.env.example src/backend/.env
-```
+ChainMind provides a visual representation of the logistics network, allowing users to understand relationships between network elements.
 
-| Variable | Description | Required |
-|---|---|---|
-| `DATABASE_URL` | SQLite (default) or PostgreSQL URL | No (defaults to SQLite) |
-| `LLM_PROVIDER` | `openai`, `watsonx`, or `none` | No |
-| `LLM_API_KEY` | OpenAI API key | Only if LLM_PROVIDER=openai |
-| `WATSONX_API_KEY` | IBM watsonx API key | Only if LLM_PROVIDER=watsonx |
-| `WATSONX_PROJECT_ID` | IBM watsonx project ID | Only if LLM_PROVIDER=watsonx |
+The Digital Twin helps visualize:
 
----
+- Ports
+- Routes
+- Network nodes
+- Fleet activity
+- Disruption states
+- Network conditions
 
-## 🤖 IBM Bob Usage
-
-IBM Bob was the primary development agent for ChainMind AI:
-
-- **Architecture design**: Designed the simulation pipeline, digital twin schema, and API structure
-- **Backend implementation**: Simulation engine, risk scorer, route optimizer, fleet optimizer, LLM explainer
-- **Database schema**: SQLAlchemy models for 12 entities
-- **Dataset generation**: Synthetic India logistics data generator
-- **ML pipeline**: Feature engineering, RandomForest/GradientBoosting training scripts
-- **Frontend**: React dashboard, Recharts visualizations, Leaflet map
-- **Testing**: 130 backend tests covering all simulation scenarios (130 passed, 1 skipped)
-- **Documentation**: All docs written with Bob
+Users can interact with relevant network elements to investigate operational details.
 
 ---
 
-## ⚠️ Known Limitations
+## 3. Disruption Intelligence
 
-- Cold-chain risk uses a simplified hackathon model (not Arrhenius degradation)
-- ML models trained on synthetic data — for demonstration purposes only
-- Map tiles require internet connection (OpenStreetMap/CartoCDN)
-- LLM explanation requires separate API key configuration; falls back to templates
-- What-If comparison runs simulations sequentially (not parallel)
+Disruptions can be investigated through a dedicated disruption workflow.
+
+Users can:
+
+- Identify active disruptions
+- Inspect disruption details
+- Understand affected routes and shipments
+- Analyze potential impact
+- Review AI-assisted analysis
+- Navigate toward available response workflows
 
 ---
 
-## 🏅 What We're Most Proud Of
+## 4. AI-Assisted Analysis
 
-The **end-to-end deterministic simulation pipeline**: from scenario input → digital twin state → cascading impact → risk scoring → route optimization → fleet allocation → strategy scoring → explainable recommendation. Every displayed number is dynamically calculated — no hardcoded results. The 72h vs 120h Mumbai Port comparison visibly demonstrates how the system responds to changed parameters, which is the core "supply-chain time machine" differentiator.
+ChainMind integrates AI-assisted reasoning into the operational workflow.
+
+The system helps users understand:
+
+- Why a disruption matters
+- Which network elements may be affected
+- Potential operational consequences
+- Response considerations
+- Recommended next steps where supported
+
+The goal is to help operations teams move from raw operational data toward actionable understanding.
+
+---
+
+## 5. Crisis Simulator
+
+The Crisis Simulator allows users to test how the supply-chain network reacts to disruption scenarios.
+
+Users can:
+
+1. Configure a crisis scenario
+2. Start the simulation
+3. Monitor simulation cycles
+4. Observe detected crises
+5. Inspect affected network elements
+6. Review the resulting operational state
+7. Continue or stop the simulation
+
+This provides a controlled environment for testing network resilience.
+
+---
+
+## 6. Manual Mode
+
+Manual Mode allows operators to control and test crisis scenarios directly.
+
+It provides an operational workflow for:
+
+- Selecting a crisis scenario
+- Configuring simulation parameters
+- Triggering a disruption
+- Monitoring its effects
+- Inspecting the resulting network state
+
+---
+
+## 7. What-If Analysis
+
+What-If Analysis allows users to explore potential disruption scenarios before making operational decisions.
+
+This helps answer questions such as:
+
+> "What happens to the network if this disruption occurs?"
+
+The purpose is to support planning, resilience analysis, and operational decision-making.
+
+---
+
+## 8. Shipments & Network Intelligence
+
+ChainMind provides dedicated views for operational network data.
+
+Users can inspect:
+
+- Shipments
+- Routes
+- Network connections
+- Operational status
+- Risk indicators
+- Disruption information
+
+The system connects these views with the broader control-center workflow.
+
+---
+
+# 🎯 Intended Users
+
+ChainMind is designed for:
+
+- Supply Chain Managers
+- Control Tower / Operations Managers
+- Logistics Managers and Planners
+- Risk & Resilience Teams
+- Dispatchers and Fleet Operators
+- Supply Chain Operations Teams
+
+### Primary User
+
+> **A Supply Chain Control Tower / Operations Manager responsible for monitoring the logistics network, detecting disruptions, understanding their impact, and deciding how to respond.**
+
+---
+
+# 🧠 Why ChainMind?
+
+ChainMind is designed around the operational decision-making process rather than simply displaying supply-chain data.
+
+Instead of forcing an operator to move between disconnected systems, ChainMind brings together:
+
+**Network Monitoring**
+
+↓
+
+**Risk Detection**
+
+↓
+
+**Disruption Investigation**
+
+↓
+
+**AI-Assisted Analysis**
+
+↓
+
+**Crisis Simulation**
+
+↓
+
+**Operational Decision Support**
+
+This creates a single workflow for understanding and responding to supply-chain disruptions.
+
+---
+
+# 🖥️ Demo
+
+### Live Demo
+
+**ChainMind AI:**  
+https://bob-ai-hackathon-y2ms-pngqxe9fu-smitrathod101.vercel.app/
+
+---
+
+# 🎬 Suggested Demo Flow
+
+The recommended demonstration follows a realistic control-center workflow:
+
+1. Open the **Overview**
+2. Show network health and operational KPIs
+3. Show the **Digital Twin**
+4. Inspect active risks
+5. Open a shipment, route, or disruption
+6. Investigate the disruption
+7. Open AI-assisted analysis
+8. Review the available response information
+9. Open **Crisis Simulator**
+10. Configure a crisis scenario
+11. Start the simulation
+12. Monitor simulation cycles
+13. Observe affected network elements
+14. Review the resulting operational state
+15. Use **Manual Mode** or **What-If Analysis** to explore additional scenarios
+
+---
+
+# 🏗️ Architecture
+
+```text
+                    ┌───────────────────────┐
+                    │      ChainMind AI     │
+                    │   Control Center UI   │
+                    └───────────┬───────────┘
+                                │
+                                ▼
+                    ┌───────────────────────┐
+                    │      React + Vite     │
+                    │      TypeScript       │
+                    └───────────┬───────────┘
+                                │
+                           REST APIs
+                                │
+                                ▼
+                    ┌───────────────────────┐
+                    │     FastAPI Backend   │
+                    │      Python           │
+                    └───────────┬───────────┘
+                                │
+                ┌───────────────┼───────────────┐
+                ▼               ▼               ▼
+          ┌──────────┐   ┌────────────┐   ┌────────────┐
+          │ SQLite   │   │ Simulation │   │ AI / ML    │
+          │ Database │   │ Engine     │   │ Analysis   │
+          └──────────┘   └────────────┘   └────────────┘
