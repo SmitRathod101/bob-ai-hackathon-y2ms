@@ -14,12 +14,12 @@ Modern supply chains are highly interconnected. A disruption at a port, route, w
 
 Operations teams need to answer questions such as:
 
-- What is happening in the network right now?
-- Which shipments and routes are at risk?
-- What will be affected if a disruption occurs?
-- How severe is the impact?
-- What response options are available?
-- How will the network behave under a simulated crisis?
+* What is happening in the network right now?
+* Which shipments and routes are at risk?
+* What will be affected if a disruption occurs?
+* How severe is the impact?
+* What response options are available?
+* How will the network behave under a simulated crisis?
 
 Traditional monitoring systems often provide data without connecting detection, investigation, analysis, and response into one workflow.
 
@@ -32,19 +32,24 @@ Traditional monitoring systems often provide data without connecting detection, 
 > **MONITOR → INVESTIGATE → ANALYZE → DECIDE → ACT**
 
 ### Monitor
+
 View the overall health of the supply-chain network through operational KPIs, shipments, routes, ports, fleet status, and active risks.
 
 ### Investigate
+
 Select shipments, routes, disruptions, and network elements to inspect their operational details and understand what is happening.
 
 ### Analyze
+
 Use AI-assisted analysis to understand disruption impact, affected network elements, and potential response considerations.
 
 ### Decide
+
 Review available information and AI-assisted recommendations before taking an operational decision.
 
 ### Act
-Use supported simulation and operational workflows to evaluate or execute the available response actions.
+
+Use supported simulation and operational workflows to evaluate or execute available response actions.
 
 ---
 
@@ -56,14 +61,14 @@ The Overview dashboard provides a centralized view of the supply-chain network.
 
 It includes:
 
-- Network health
-- Active risks
-- Shipment status
-- Port network
-- Fleet status
-- Active disruptions
-- Digital Twin network visualization
-- Operational KPIs
+* Network health
+* Active risks
+* Shipment status
+* Port network
+* Fleet status
+* Active disruptions
+* Digital Twin network visualization
+* Operational KPIs
 
 ---
 
@@ -73,12 +78,12 @@ ChainMind provides a visual representation of the logistics network, allowing us
 
 The Digital Twin helps visualize:
 
-- Ports
-- Routes
-- Network nodes
-- Fleet activity
-- Disruption states
-- Network conditions
+* Ports
+* Routes
+* Network nodes
+* Fleet activity
+* Disruption states
+* Network conditions
 
 Users can interact with relevant network elements to investigate operational details.
 
@@ -90,12 +95,12 @@ Disruptions can be investigated through a dedicated disruption workflow.
 
 Users can:
 
-- Identify active disruptions
-- Inspect disruption details
-- Understand affected routes and shipments
-- Analyze potential impact
-- Review AI-assisted analysis
-- Navigate toward available response workflows
+* Identify active disruptions
+* Inspect disruption details
+* Understand affected routes and shipments
+* Analyze potential impact
+* Review AI-assisted analysis
+* Navigate toward available response workflows
 
 ---
 
@@ -105,11 +110,11 @@ ChainMind integrates AI-assisted reasoning into the operational workflow.
 
 The system helps users understand:
 
-- Why a disruption matters
-- Which network elements may be affected
-- Potential operational consequences
-- Response considerations
-- Recommended next steps where supported
+* Why a disruption matters
+* Which network elements may be affected
+* Potential operational consequences
+* Response considerations
+* Recommended next steps where supported
 
 The goal is to help operations teams move from raw operational data toward actionable understanding.
 
@@ -139,11 +144,11 @@ Manual Mode allows operators to control and test crisis scenarios directly.
 
 It provides an operational workflow for:
 
-- Selecting a crisis scenario
-- Configuring simulation parameters
-- Triggering a disruption
-- Monitoring its effects
-- Inspecting the resulting network state
+* Selecting a crisis scenario
+* Configuring simulation parameters
+* Triggering a disruption
+* Monitoring its effects
+* Inspecting the resulting network state
 
 ---
 
@@ -165,12 +170,12 @@ ChainMind provides dedicated views for operational network data.
 
 Users can inspect:
 
-- Shipments
-- Routes
-- Network connections
-- Operational status
-- Risk indicators
-- Disruption information
+* Shipments
+* Routes
+* Network connections
+* Operational status
+* Risk indicators
+* Disruption information
 
 The system connects these views with the broader control-center workflow.
 
@@ -180,12 +185,12 @@ The system connects these views with the broader control-center workflow.
 
 ChainMind is designed for:
 
-- Supply Chain Managers
-- Control Tower / Operations Managers
-- Logistics Managers and Planners
-- Risk & Resilience Teams
-- Dispatchers and Fleet Operators
-- Supply Chain Operations Teams
+* Supply Chain Managers
+* Control Tower / Operations Managers
+* Logistics Managers and Planners
+* Risk & Resilience Teams
+* Dispatchers and Fleet Operators
+* Supply Chain Operations Teams
 
 ### Primary User
 
@@ -227,10 +232,15 @@ This creates a single workflow for understanding and responding to supply-chain 
 
 # 🖥️ Demo
 
-### Live Demo
+### 🌐 Live Demo
 
-**ChainMind AI:**  
+**ChainMind AI:**
 https://bob-ai-hackathon-y2ms.vercel.app/
+
+### 🎬 Demo Video
+
+**ChainMind AI — Round 2 Demo:**
+https://youtu.be/9kFt0Cx7dCg
 
 ---
 
@@ -266,21 +276,72 @@ The recommended demonstration follows a realistic control-center workflow:
                                 │
                                 ▼
                     ┌───────────────────────┐
-                    │      React + Vite     │
-                    │      TypeScript       │
+                    │     React + Vite      │
+                    │     TypeScript        │
                     └───────────┬───────────┘
                                 │
                            REST APIs
                                 │
                                 ▼
                     ┌───────────────────────┐
-                    │     FastAPI Backend   │
-                    │      Python           │
+                    │    FastAPI Backend    │
+                    │       Python          │
                     └───────────┬───────────┘
                                 │
-                ┌───────────────┼───────────────┐
-                ▼               ▼               ▼
-          ┌──────────┐   ┌────────────┐   ┌────────────┐
-          │ SQLite   │   │ Simulation │   │ AI / ML    │
-          │ Database │   │ Engine     │   │ Analysis   │
-          └──────────┘   └────────────┘   └────────────┘
+               ┌────────────────┼────────────────┐
+               ▼                ▼                ▼
+        ┌──────────┐     ┌────────────┐    ┌────────────┐
+        │  SQLite  │     │ Simulation │    │  AI / ML   │
+        │ Database │     │   Engine   │    │  Analysis  │
+        └──────────┘     └────────────┘    └────────────┘
+```
+
+---
+
+# 🛠️ Technology Stack
+
+* **Frontend:** React, Vite, TypeScript
+* **Backend:** FastAPI, Python
+* **Database:** SQLite
+* **APIs:** REST
+* **Simulation:** Python-based crisis simulation engine
+* **AI:** AI-assisted disruption analysis
+* **Deployment:** Vercel + Render
+
+---
+
+# 🔄 Operational Workflow
+
+```text
+Monitor
+   ↓
+Investigate
+   ↓
+Analyze
+   ↓
+Decide
+   ↓
+Act
+   ↓
+Simulate / Evaluate
+   ↓
+Monitor Again
+```
+
+ChainMind turns supply-chain disruption management into a continuous operational feedback loop.
+
+---
+
+# 📌 Project Status
+
+**Round 2 — Hackathon Submission**
+
+The deployed application provides an operational control-center interface with network monitoring, disruption intelligence, AI-assisted analysis, crisis simulation, manual intervention, and what-if analysis workflows.
+
+---
+
+# 👥 Team
+
+**ChainMind AI**
+
+Built for the hackathon with a focus on AI-powered supply-chain resilience and operational decision support.
