@@ -230,7 +230,7 @@ This creates a single workflow for understanding and responding to supply-chain 
 ### Live Demo
 
 **ChainMind AI:**  
-https://bob-ai-hackathon-y2ms-pngqxe9fu-smitrathod101.vercel.app/
+https://bob-ai-hackathon-y2ms.vercel.app/
 
 ---
 
