@@ -18,31 +18,30 @@ type StrategyMeta = {
 
 const STRATEGY_META: Record<string, StrategyMeta> = {
   cheapest: {
-    icon: <DollarSign className="w-5 h-5 text-green-400" />,
-    color: 'text-green-400',
-    border: 'border-green-700/50',
-    bg: 'bg-green-900/10',
-    headerBg: 'bg-green-900/20',
+    icon: <DollarSign className="w-5 h-5 text-green-600" />,
+    color: 'text-green-700',
+    border: 'border-green-200',
+    bg: 'bg-green-50',
+    headerBg: 'bg-green-50',
   },
   fastest: {
-    icon: <Zap className="w-5 h-5 text-yellow-400" />,
-    color: 'text-yellow-400',
-    border: 'border-yellow-700/50',
-    bg: 'bg-yellow-900/10',
-    headerBg: 'bg-yellow-900/20',
+    icon: <Zap className="w-5 h-5 text-amber-600" />,
+    color: 'text-amber-700',
+    border: 'border-amber-200',
+    bg: 'bg-amber-50',
+    headerBg: 'bg-amber-50',
   },
   balanced: {
-    icon: <Brain className="w-5 h-5 text-blue-400" />,
-    color: 'text-blue-400',
-    border: 'border-blue-600',
-    bg: 'bg-blue-900/20',
-    headerBg: 'bg-blue-900/30',
+    icon: <Brain className="w-5 h-5 text-blue-600" />,
+    color: 'text-blue-700',
+    border: 'border-blue-300',
+    bg: 'bg-blue-50',
+    headerBg: 'bg-blue-50',
   },
 };
 
 export default function StrategyCards({ strategies }: StrategyCardsProps) {
   const [expandedActions, setExpandedActions] = useState<Set<string>>(() => {
-    // Auto-expand action plan for the recommended strategy
     const recommended = strategies.find(s => s.is_recommended);
     return recommended ? new Set([recommended.strategy_id]) : new Set();
   });
@@ -61,8 +60,8 @@ export default function StrategyCards({ strategies }: StrategyCardsProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-slate-200">Recovery Strategy Comparison</h3>
-        <span className="text-xs text-slate-500">Scored: 30% delay · 25% cost · 25% cold-chain · 20% risk</span>
+        <h3 className="text-base font-semibold text-gray-800">Recovery Strategy Comparison</h3>
+        <span className="text-xs text-gray-400">Scored: 30% delay · 25% cost · 25% cold-chain · 20% risk</span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {strategies.map(strategy => {
@@ -73,7 +72,7 @@ export default function StrategyCards({ strategies }: StrategyCardsProps) {
             <div
               key={strategy.strategy_id}
               className={`rounded-xl border-2 transition-all flex flex-col ${meta.border} ${
-                strategy.is_recommended ? 'shadow-lg shadow-blue-900/30' : ''
+                strategy.is_recommended ? 'shadow-md shadow-blue-100' : 'shadow-sm'
               }`}
             >
               {/* Card Header */}
@@ -91,17 +90,17 @@ export default function StrategyCards({ strategies }: StrategyCardsProps) {
               </div>
 
               {/* Metrics */}
-              <div className={`px-5 py-4 flex-1 ${meta.bg}`}>
+              <div className="px-5 py-4 flex-1 bg-white">
                 <div className="space-y-3">
                   {/* Big numbers */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="text-center bg-slate-800/60 rounded-lg py-2.5 px-2">
-                      <p className="text-xl font-bold text-white">{formatCurrency(strategy.additional_cost_inr)}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">Additional Cost</p>
+                    <div className="text-center bg-gray-50 border border-gray-200 rounded-lg py-2.5 px-2">
+                      <p className="text-xl font-bold text-gray-900">{formatCurrency(strategy.additional_cost_inr)}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Additional Cost</p>
                     </div>
-                    <div className="text-center bg-slate-800/60 rounded-lg py-2.5 px-2">
-                      <p className="text-xl font-bold text-white">{formatDelay(strategy.average_delay_hours)}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">Avg Delay</p>
+                    <div className="text-center bg-gray-50 border border-gray-200 rounded-lg py-2.5 px-2">
+                      <p className="text-xl font-bold text-gray-900">{formatDelay(strategy.average_delay_hours)}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Avg Delay</p>
                     </div>
                   </div>
 
@@ -117,18 +116,18 @@ export default function StrategyCards({ strategies }: StrategyCardsProps) {
                     />
                     <MetricRow
                       label="Fleet Required"
-                      value={<span className="text-white text-sm">{strategy.fleet_required} vehicles</span>}
+                      value={<span className="text-gray-800 text-sm">{strategy.fleet_required} vehicles</span>}
                     />
                     <MetricRow
                       label="Affected Shipments"
-                      value={<span className="text-white text-sm">{strategy.affected_shipments}</span>}
+                      value={<span className="text-gray-800 text-sm">{strategy.affected_shipments}</span>}
                     />
                     <MetricRow
                       label="Cold-Chain Risk"
                       value={
                         <span className={`text-sm font-medium ${
-                          strategy.cold_chain_risk_score > 0.5 ? 'text-red-400' :
-                          strategy.cold_chain_risk_score > 0.3 ? 'text-yellow-400' : 'text-green-400'
+                          strategy.cold_chain_risk_score > 0.5 ? 'text-red-600' :
+                          strategy.cold_chain_risk_score > 0.3 ? 'text-amber-600' : 'text-green-600'
                         }`}>
                           {(strategy.cold_chain_risk_score * 100).toFixed(0)}%
                         </span>
@@ -139,13 +138,13 @@ export default function StrategyCards({ strategies }: StrategyCardsProps) {
                         label="Strategy Score"
                         value={
                           <div className="flex items-center gap-2">
-                            <div className="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                            <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                               <div
-                                className={`h-full rounded-full ${strategy.is_recommended ? 'bg-blue-500' : 'bg-slate-500'}`}
+                                className={`h-full rounded-full ${strategy.is_recommended ? 'bg-blue-500' : 'bg-gray-400'}`}
                                 style={{ width: `${Math.max(5, 100 - strategy.strategy_score * 100)}%` }}
                               />
                             </div>
-                            <span className="text-slate-400 text-xs">{strategy.strategy_score.toFixed(3)}</span>
+                            <span className="text-gray-500 text-xs">{strategy.strategy_score.toFixed(3)}</span>
                           </div>
                         }
                       />
@@ -153,7 +152,7 @@ export default function StrategyCards({ strategies }: StrategyCardsProps) {
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs text-slate-400 leading-relaxed border-t border-slate-700 pt-3">
+                  <p className="text-xs text-gray-500 leading-relaxed border-t border-gray-200 pt-3">
                     {strategy.description}
                   </p>
                 </div>
@@ -165,7 +164,7 @@ export default function StrategyCards({ strategies }: StrategyCardsProps) {
                   <button
                     onClick={() => toggleAction(strategy.strategy_id)}
                     className={`w-full flex items-center justify-between px-5 py-2.5 text-xs font-medium transition-colors ${
-                      isExpanded ? 'text-blue-300 bg-blue-900/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                      isExpanded ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                     }`}
                   >
                     <span className="flex items-center gap-1.5">
@@ -176,19 +175,19 @@ export default function StrategyCards({ strategies }: StrategyCardsProps) {
                   </button>
 
                   {isExpanded && (
-                    <div className="px-5 py-4 bg-slate-800/40 space-y-4">
+                    <div className="px-5 py-4 bg-gray-50 space-y-4">
                       {strategy.action_plan.map((phase, i) => (
                         <div key={i}>
-                          <p className="text-xs font-semibold text-slate-200 mb-2 flex items-center gap-1.5">
+                          <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
                             <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                              i === 0 ? 'bg-red-600 text-white' : i === 1 ? 'bg-yellow-600 text-white' : 'bg-blue-600 text-white'
+                              i === 0 ? 'bg-red-500 text-white' : i === 1 ? 'bg-amber-500 text-white' : 'bg-blue-500 text-white'
                             }`}>{i + 1}</span>
                             {phase.time}
                           </p>
                           <ul className="space-y-1.5 ml-6">
                             {phase.actions.map((action, j) => (
-                              <li key={j} className="text-xs text-slate-400 flex items-start gap-1.5">
-                                <span className="text-blue-400 mt-0.5 flex-shrink-0">→</span>
+                              <li key={j} className="text-xs text-gray-600 flex items-start gap-1.5">
+                                <span className="text-blue-500 mt-0.5 flex-shrink-0">→</span>
                                 {action}
                               </li>
                             ))}
@@ -210,7 +209,7 @@ export default function StrategyCards({ strategies }: StrategyCardsProps) {
 function MetricRow({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-xs text-slate-400">{label}</span>
+      <span className="text-xs text-gray-500">{label}</span>
       {value}
     </div>
   );

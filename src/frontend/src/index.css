@@ -8,95 +8,151 @@
   box-sizing: border-box;
 }
 
+html, body, #root {
+  height: 100%;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+
 body {
   margin: 0;
   font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: #f0f2f5;
+  color: #1a202c;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #1e293b; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
+::-webkit-scrollbar-track { background: #f0f2f5; }
+::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
+
+/* ── Layout shell ─────────────────────────────────────────────────────────── */
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: #f0f2f5;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+  background: #f0f2f5;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────────── */
 
 .card {
-  @apply bg-slate-800 border border-slate-700 rounded-xl;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
-  @apply px-5 py-4 border-b border-slate-700;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .card-body {
-  @apply p-5;
+  padding: 1.25rem;
 }
 
 .kpi-card {
-  @apply bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col gap-1;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
 .btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-5 py-2.5 rounded-lg transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white shadow-sm;
 }
 
 .btn-secondary {
-  @apply bg-slate-700 hover:bg-slate-600 text-slate-200 font-medium px-4 py-2 rounded-lg transition-colors duration-150;
+  @apply bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-medium px-4 py-2 rounded-lg border border-slate-200 hover:border-slate-300 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white shadow-sm;
 }
 
 .btn-danger {
-  @apply bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  @apply bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-medium px-4 py-2 rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm;
 }
 
+/* ── Form fields ──────────────────────────────────────────────────────────── */
+
 .input-field {
-  @apply w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
+  @apply w-full bg-white border border-slate-200 text-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors placeholder:text-slate-400 shadow-sm;
 }
 
 .select-field {
-  @apply w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none;
+  @apply w-full bg-white border border-slate-200 text-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 appearance-none transition-colors shadow-sm;
 }
 
 .label {
-  @apply text-xs font-medium text-slate-400 uppercase tracking-wide mb-1 block;
+  @apply text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block;
 }
+
+/* ── Status badges ────────────────────────────────────────────────────────── */
 
 .badge {
-  @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border;
+  @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border;
 }
 
-.badge-critical { @apply bg-red-900/50 text-red-300 border-red-700; }
-.badge-high { @apply bg-orange-900/50 text-orange-300 border-orange-700; }
-.badge-medium { @apply bg-yellow-900/50 text-yellow-300 border-yellow-700; }
-.badge-low { @apply bg-green-900/50 text-green-300 border-green-700; }
+.badge-critical { @apply bg-red-50    text-red-700    border-red-200; }
+.badge-high     { @apply bg-orange-50 text-orange-700 border-orange-200; }
+.badge-medium   { @apply bg-amber-50  text-amber-700  border-amber-200; }
+.badge-low      { @apply bg-green-50  text-green-700  border-green-200; }
+
+/* ── Strategy cards ───────────────────────────────────────────────────────── */
 
 .strategy-card {
-  @apply bg-slate-750 border-2 rounded-xl p-5 cursor-pointer transition-all duration-200;
-}
-
-.strategy-card:hover {
-  @apply border-blue-500;
+  @apply bg-white border-2 border-slate-200 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:border-blue-400 hover:shadow-md focus:outline-none;
 }
 
 .strategy-card.recommended {
-  @apply border-blue-500 bg-blue-900/20;
+  @apply border-blue-500 bg-blue-50/50 shadow-sm;
 }
 
+/* ── Nav tabs ─────────────────────────────────────────────────────────────── */
+
 .nav-tab {
-  @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors;
+  @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150;
 }
 
 .nav-tab.active {
-  @apply bg-blue-600 text-white;
+  @apply bg-blue-600 text-white shadow-sm;
 }
 
 .nav-tab:not(.active) {
-  @apply text-slate-400 hover:text-slate-200 hover:bg-slate-700;
+  @apply text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent;
 }
+
+/* ── Spinner ──────────────────────────────────────────────────────────────── */
 
 .loading-spinner {
   @apply animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full;
 }
+
+/* ── Disruption animations ────────────────────────────────────────────────── */
 
 .disruption-pulse {
   animation: pulse-red 2s infinite;
@@ -104,38 +160,36 @@ body {
 
 @keyframes pulse-red {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50%       { opacity: 0.5; }
 }
+
+/* ── Recharts overrides ───────────────────────────────────────────────────── */
 
 .recharts-tooltip-wrapper .recharts-default-tooltip {
-  background: #1e293b !important;
-  border: 1px solid #334155 !important;
-  color: #e2e8f0 !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #1a202c !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10) !important;
 }
 
-/* ── Prompt 3: Digital Twin UI polish ─────────────────────────────────────── */
+/* ── Digital Twin SVG canvas — keep dark for map contrast ────────────────── */
 
-/* Smooth glow transitions for status indicators */
-.status-glow-green { box-shadow: 0 0 8px rgba(34, 197, 94, 0.3); }
-.status-glow-red   { box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
-.status-glow-amber { box-shadow: 0 0 8px rgba(245, 158, 11, 0.3); }
-
-/* Animate SVG truck dots smoothly */
 svg circle {
   transition: r 0.15s ease, fill 0.3s ease;
 }
 
-/* Card hover enhancement */
 .card:hover {
-  border-color: #334155;
+  border-color: #cbd5e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* Digital Twin SVG canvas */
 .digital-twin-canvas {
-  background: #060f1e;
+  background: #0c1929;
 }
 
-/* Narrative point animation */
+/* ── Narrative animations ─────────────────────────────────────────────────── */
+
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -145,10 +199,18 @@ svg circle {
   animation: fadeInUp 0.3s ease forwards;
 }
 
-/* Delta card */
-.delta-worse { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.05); }
-.delta-same  { border-color: rgba(100,116,139,0.4); }
+/* ── Status glow effects ──────────────────────────────────────────────────── */
 
-/* Ensure bg-slate-750 works */
-.bg-slate-750 { background-color: #1e2a3a; }
+.status-glow-green { box-shadow: 0 0 8px rgba(34, 197, 94, 0.25); }
+.status-glow-red   { box-shadow: 0 0 8px rgba(239, 68, 68, 0.25); }
+.status-glow-amber { box-shadow: 0 0 8px rgba(245, 158, 11, 0.25); }
 
+/* ── What-If delta cards ──────────────────────────────────────────────────── */
+
+.delta-worse { border-color: rgba(239,68,68,0.35); background: rgba(254,242,242,0.8); }
+.delta-same  { border-color: rgba(203,213,225,0.8); }
+
+/* ── Utility ──────────────────────────────────────────────────────────────── */
+
+/* Provide a neutral mid-tone surface for nested items */
+.bg-slate-750 { background-color: #f8fafc; }

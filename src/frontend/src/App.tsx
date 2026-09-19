@@ -1,17 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
-import Header from './components/Header';
-import DashboardTab from './components/DashboardTab';
-import SimulationTab from './components/SimulationTab';
-import WhatIfTab from './components/WhatIfTab';
-import HistoryTab from './components/HistoryTab';
-import ManualModeTab from './components/ManualModeTab';
-import AutoModeTab from './components/AutoModeTab';
+import Sidebar, { type NavSection } from './components/Sidebar';
+import TopBar from './components/TopBar';
+import OverviewDashboard from './components/OverviewDashboard';
+import ShipmentsPage from './components/ShipmentsPage';
+import NetworkPage from './components/NetworkPage';
+import DisruptionsPage from './components/DisruptionsPage';
+import AIRecommendationsPage from './components/AIRecommendationsPage';
+import CrisisSimulatorPage from './components/CrisisSimulatorPage';
+import WhatIfPage from './components/WhatIfPage';
+import NetworkHealthPage from './components/NetworkHealthPage';
+import HistoryPage from './components/HistoryPage';
+import ManualModePage from './components/ManualModePage';
 import { getDashboardSummary, type DashboardSummary } from './services/api';
 
-type Tab = 'dashboard' | 'simulate' | 'whatif' | 'history' | 'manual' | 'auto';
-
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
+  const [section, setSection] = useState<NavSection>('overview');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [dashboardData, setDashboardData] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,56 +38,77 @@ export default function App() {
     loadDashboard();
   }, [loadDashboard]);
 
+  const alertCount = dashboardData
+    ? dashboardData.delayed +
+      dashboardData.ports.filter(p => p.operational_status !== 'operational').length
+    : 0;
+
+  const backendStatus: 'ok' | 'loading' | 'error' =
+    error ? 'error' : loading ? 'loading' : 'ok';
+
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col">
-      <Header
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        backendStatus={error ? 'error' : loading ? 'loading' : 'ok'}
+    <div className="app-shell">
+      <Sidebar
+        active={section}
+        onChange={setSection}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(v => !v)}
       />
 
-      <main className="flex-1 px-4 md:px-6 py-6 max-w-screen-2xl mx-auto w-full">
-        {error && (
-          <div className="mb-4 bg-red-900/30 border border-red-700 rounded-lg p-4 text-red-300 text-sm">
-            <strong>Backend connection error:</strong> {error}
-            <button
-              onClick={loadDashboard}
-              className="ml-4 underline hover:text-red-200"
-            >
-              Retry
-            </button>
-          </div>
-        )}
+      <div className="app-main">
+        <TopBar
+          section={section}
+          backendStatus={backendStatus}
+          onRefresh={loadDashboard}
+          alertCount={alertCount}
+        />
 
-        {activeTab === 'dashboard' && (
-          <DashboardTab data={dashboardData} loading={loading} onRefresh={loadDashboard} />
-        )}
-        {activeTab === 'simulate' && (
-          <SimulationTab
-            ports={dashboardData?.ports ?? []}
-            onSimulationComplete={() => {
-              // Refresh dashboard after simulation
-              loadDashboard();
-            }}
-          />
-        )}
-        {activeTab === 'whatif' && (
-          <WhatIfTab />
-        )}
-        {activeTab === 'history' && (
-          <HistoryTab recentSimulations={dashboardData?.recent_simulations ?? []} />
-        )}
-        {activeTab === 'manual' && (
-          <ManualModeTab />
-        )}
-        {activeTab === 'auto' && (
-          <AutoModeTab />
-        )}
-      </main>
+        <div className="app-content">
+          {/* Backend error banner */}
+          {error && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-3">
+              <span className="font-semibold">Backend connection error:</span>
+              <span className="flex-1">{error}</span>
+              <button
+                onClick={loadDashboard}
+                className="text-red-700 underline hover:text-red-900 font-medium flex-shrink-0"
+              >
+                Retry
+              </button>
+            </div>
+          )}
 
-      <footer className="text-center text-slate-600 text-xs py-4 border-t border-slate-800">
-        ChainMind AI — Supply Chain Crisis Simulator &copy; 2025 | IBM Bobathon
-      </footer>
+          {section === 'overview' && (
+            <OverviewDashboard
+              data={dashboardData}
+              loading={loading}
+              onNavigate={setSection as (s: string) => void}
+            />
+          )}
+          {section === 'shipments' && <ShipmentsPage />}
+          {section === 'network'   && <NetworkPage />}
+          {section === 'disruptions' && <DisruptionsPage onNavigate={setSection as (s: string) => void} />}
+          {section === 'ai-recommendations' && <AIRecommendationsPage />}
+          {section === 'crisis-simulator' && (
+            <CrisisSimulatorPage
+              ports={dashboardData?.ports ?? []}
+              onSimulationComplete={loadDashboard}
+              onNavigate={setSection as (s: string) => void}
+            />
+          )}
+          {section === 'manual-mode' && (
+            <ManualModePage
+              onSimulationComplete={loadDashboard}
+              onNavigate={setSection as (s: string) => void}
+            />
+          )}
+          {section === 'whatif' && <WhatIfPage />}
+          {section === 'network-health' && <NetworkHealthPage />}
+          {section === 'history' && (
+            <HistoryPage recentSimulations={dashboardData?.recent_simulations ?? []} />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

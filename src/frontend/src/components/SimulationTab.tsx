@@ -13,7 +13,7 @@ import ScenarioCompareBanner from './ScenarioCompareBanner';
 import RiskCharts from './charts/RiskCharts';
 import {
   Zap, AlertTriangle, Loader2, RefreshCw, ChevronDown, ChevronUp,
-  Package, RotateCcw, History
+  Package, RotateCcw, History, ArrowLeft, BrainCircuit,
 } from 'lucide-react';
 
 const DISRUPTION_TYPES = [
@@ -65,9 +65,10 @@ const DEMO_PRESETS: Array<{ label: string; scenario: SimulationRequest }> = [
 interface SimulationTabProps {
   ports: Port[];
   onSimulationComplete: () => void;
+  onNavigate?: (section: string) => void;
 }
 
-export default function SimulationTab({ ports, onSimulationComplete }: SimulationTabProps) {
+export default function SimulationTab({ ports, onSimulationComplete, onNavigate }: SimulationTabProps) {
   const [form, setForm] = useState<SimulationRequest>({
     disruption_type: 'port_closure',
     location: 'Mumbai Port',
@@ -124,8 +125,8 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white">Crisis Simulation</h2>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <h2 className="text-xl font-semibold text-slate-900">Crisis Simulation</h2>
+          <p className="text-slate-500 text-sm mt-0.5">
             Configure a disruption scenario and simulate cascading supply chain impact in real-time
           </p>
         </div>
@@ -143,10 +144,10 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
         <div className="lg:col-span-1 space-y-4">
           <div className="card">
             <div className="card-header flex items-center gap-2">
-              <Zap className="w-4 h-4 text-yellow-400" />
-              <h3 className="text-sm font-semibold text-slate-200">Scenario Configuration</h3>
+              <Zap className="w-4 h-4 text-amber-500" />
+              <h3 className="text-sm font-semibold text-slate-800">Scenario Configuration</h3>
               {result && (
-                <span className="ml-auto text-xs bg-green-900/40 text-green-400 border border-green-700 px-2 py-0.5 rounded-full">
+                <span className="ml-auto text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">
                   Run #{result.simulation_id.slice(-4)}
                 </span>
               )}
@@ -184,7 +185,7 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
               {/* Duration slider */}
               <div>
                 <label className="label">
-                  Duration: <strong className="text-white">{form.duration_hours}h</strong>
+                  Duration: <strong className="text-slate-800">{form.duration_hours}h</strong>
                   <span className="text-slate-500 ml-1">({(form.duration_hours / 24).toFixed(1)} days)</span>
                 </label>
                 <input
@@ -211,10 +212,10 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
                       onClick={() => setForm(f => ({ ...f, severity: sev }))}
                       className={`py-2 rounded-lg text-sm font-medium capitalize transition-colors ${
                         form.severity === sev
-                          ? sev === 'high'   ? 'bg-red-600 text-white ring-2 ring-red-500/50'
-                          : sev === 'medium' ? 'bg-yellow-600 text-white ring-2 ring-yellow-500/50'
-                          :                   'bg-green-600 text-white ring-2 ring-green-500/50'
-                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                          ? sev === 'high'   ? 'bg-red-600 text-white ring-2 ring-red-300'
+                          : sev === 'medium' ? 'bg-amber-500 text-white ring-2 ring-amber-300'
+                          :                   'bg-green-600 text-white ring-2 ring-green-300'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
                       }`}
                     >
                       {sev}
@@ -226,7 +227,7 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
               {/* Capacity blocked */}
               <div>
                 <label className="label">
-                  Capacity Blocked: <strong className="text-white">{Math.round((form.capacity_reduction ?? 1) * 100)}%</strong>
+                  Capacity Blocked: <strong className="text-slate-800">{Math.round((form.capacity_reduction ?? 1) * 100)}%</strong>
                 </label>
                 <input
                   type="range"
@@ -244,7 +245,7 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
 
               {/* Error */}
               {error && (
-                <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 text-red-300 text-xs">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-xs">
                   <strong>Error:</strong> {error}
                 </div>
               )}
@@ -282,17 +283,17 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
           <div className="card">
             <div className="card-header flex items-center gap-2">
               <History className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-xs font-medium text-slate-400">Demo Presets</span>
+              <span className="text-xs font-medium text-slate-600">Demo Presets</span>
             </div>
             <div className="card-body pt-3 pb-4 grid grid-cols-2 gap-2">
               {DEMO_PRESETS.map(preset => (
                 <button
                   key={preset.label}
                   onClick={() => handlePreset(preset.scenario)}
-                  className="text-xs bg-slate-700 hover:bg-slate-600 border border-slate-600 hover:border-slate-500 px-3 py-2 rounded-lg text-slate-300 transition-colors text-left"
+                  className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 px-3 py-2 rounded-lg text-slate-700 transition-colors text-left"
                 >
                   {preset.label}
-                  <div className="text-slate-500 text-xs mt-0.5">
+                  <div className="text-slate-400 text-xs mt-0.5">
                     {preset.scenario.duration_hours}h · {preset.scenario.severity}
                   </div>
                 </button>
@@ -312,11 +313,11 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
           {/* Run hint when no result */}
           {!result && !loading && (
             <div className="mt-3 text-center text-xs text-slate-500">
-              Configure a scenario and click <strong className="text-slate-400">Run Crisis Simulation</strong> to see disruption impact on the digital twin
+              Configure a scenario and click <strong className="text-slate-700">Run Crisis Simulation</strong> to see disruption impact on the digital twin
             </div>
           )}
           {loading && (
-            <div className="mt-3 flex items-center justify-center gap-2 text-xs text-blue-400">
+            <div className="mt-3 flex items-center justify-center gap-2 text-xs text-blue-600">
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
               Calculating cascading impact across {ports.length} ports and the route network...
             </div>
@@ -334,10 +335,10 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
           )}
 
           {/* ② Disruption impact header */}
-          <div className="bg-red-900/20 border border-red-700/60 rounded-xl p-5">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-5">
             <div className="flex flex-wrap items-center gap-3 mb-4">
-              <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
-              <h3 className="text-base font-semibold text-red-300 flex-1">
+              <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <h3 className="text-base font-semibold text-red-800 flex-1">
                 {disruption_label(result.scenario.disruption_type)} Impact — {result.scenario.location}
               </h3>
               <div className="flex items-center gap-2 flex-wrap">
@@ -409,13 +410,37 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
             />
           )}
 
+          {/* ⑦ᵦ Post-simulation CTAs */}
+          {onNavigate && (
+            <div className="flex flex-wrap items-center gap-3 p-5 bg-slate-50 border border-slate-200 rounded-xl">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-700">Simulation complete — what next?</p>
+                <p className="text-xs text-slate-500 mt-0.5">Review AI recommendations or return to the overview dashboard</p>
+              </div>
+              <button
+                onClick={() => onNavigate('ai-recommendations')}
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"
+              >
+                <BrainCircuit className="w-4 h-4" />
+                View AI Recommendations
+              </button>
+              <button
+                onClick={() => onNavigate('overview')}
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 transition-colors shadow-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Return to Overview
+              </button>
+            </div>
+          )}
+
           {/* ⑧ Top risk shipments table */}
           {result.top_risk_shipments.length > 0 && (
             <div className="card">
               <div className="card-header flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 text-red-400" />
-                  <h3 className="text-sm font-semibold text-slate-200">
+                  <Package className="w-4 h-4 text-red-500" />
+                  <h3 className="text-sm font-semibold text-slate-800">
                     Top Risk Shipments
                   </h3>
                   <span className="badge badge-high text-xs">
@@ -424,7 +449,7 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
                 </div>
                 <button
                   onClick={() => setShowRawShipments(v => !v)}
-                  className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-200"
+                  className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700"
                 >
                   {showRawShipments ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                   {showRawShipments ? 'Show fewer' : 'Show all'}
@@ -433,41 +458,41 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-700 bg-slate-800/40">
-                      <th className="text-left text-slate-400 font-medium px-5 py-2.5">Shipment ID</th>
-                      <th className="text-center text-slate-400 font-medium px-4 py-2.5">Risk</th>
-                      <th className="text-right text-slate-400 font-medium px-4 py-2.5">Delay</th>
-                      <th className="text-right text-slate-400 font-medium px-4 py-2.5">Cargo Value</th>
-                      <th className="text-right text-slate-400 font-medium px-4 py-2.5">Cold Chain</th>
-                      <th className="text-center text-slate-400 font-medium px-4 py-2.5">Impact Type</th>
+                    <tr className="border-b border-slate-200 bg-slate-50">
+                      <th className="text-left text-slate-500 font-medium px-5 py-2.5">Shipment ID</th>
+                      <th className="text-center text-slate-500 font-medium px-4 py-2.5">Risk</th>
+                      <th className="text-right text-slate-500 font-medium px-4 py-2.5">Delay</th>
+                      <th className="text-right text-slate-500 font-medium px-4 py-2.5">Cargo Value</th>
+                      <th className="text-right text-slate-500 font-medium px-4 py-2.5">Cold Chain</th>
+                      <th className="text-center text-slate-500 font-medium px-4 py-2.5">Impact Type</th>
                     </tr>
                   </thead>
                   <tbody>
                     {result.top_risk_shipments
                       .slice(0, showRawShipments ? undefined : 10)
                       .map(s => (
-                        <tr key={s.shipment_id} className="border-b border-slate-800 hover:bg-slate-800/40 transition-colors">
-                          <td className="px-5 py-2.5 font-mono text-slate-200 text-xs">{s.shipment_id}</td>
+                        <tr key={s.shipment_id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                          <td className="px-5 py-2.5 font-mono text-slate-700 text-xs">{s.shipment_id}</td>
                           <td className="px-4 py-2.5 text-center">
                             <span className={`badge capitalize badge-${s.risk_level} text-xs`}>
                               {s.risk_level}
                             </span>
                           </td>
                           <td className="px-4 py-2.5 text-right">
-                            <span className="text-slate-200 font-medium">{formatDelay(s.delay_hours)}</span>
+                            <span className="text-slate-800 font-medium">{formatDelay(s.delay_hours)}</span>
                             <span className="text-slate-500 text-xs ml-1">({s.delay_hours.toFixed(0)}h)</span>
                           </td>
-                          <td className="px-4 py-2.5 text-right text-slate-200">{formatCurrency(s.cargo_value)}</td>
+                          <td className="px-4 py-2.5 text-right text-slate-800">{formatCurrency(s.cargo_value)}</td>
                           <td className="px-4 py-2.5 text-right">
                             {s.cold_chain_risk > 0.1 ? (
                               <div className="flex items-center justify-end gap-1.5">
-                                <div className="w-12 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                                <div className="w-12 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                                   <div
                                     className={`h-full rounded-full ${s.cold_chain_risk > 0.7 ? 'bg-red-500' : s.cold_chain_risk > 0.4 ? 'bg-orange-500' : 'bg-yellow-500'}`}
                                     style={{ width: `${s.cold_chain_risk * 100}%` }}
                                   />
                                 </div>
-                                <span className="text-cyan-400 text-xs">{(s.cold_chain_risk * 100).toFixed(0)}%</span>
+                                <span className="text-cyan-600 text-xs font-medium">{(s.cold_chain_risk * 100).toFixed(0)}%</span>
                               </div>
                             ) : (
                               <span className="text-slate-600 text-xs">—</span>
@@ -476,8 +501,8 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
                           <td className="px-4 py-2.5 text-center">
                             <span className={`text-xs font-medium px-2 py-0.5 rounded ${
                               s.is_direct
-                                ? 'bg-red-900/40 text-red-300'
-                                : 'bg-orange-900/40 text-orange-300'
+                                ? 'bg-red-50 text-red-700 border border-red-200'
+                                : 'bg-orange-50 text-orange-700 border border-orange-200'
                             }`}>
                               {s.is_direct ? 'Direct' : 'Cascade'}
                             </span>
@@ -487,9 +512,9 @@ export default function SimulationTab({ ports, onSimulationComplete }: Simulatio
                   </tbody>
                 </table>
                 {!showRawShipments && result.top_risk_shipments.length > 10 && (
-                  <div className="text-center py-3 text-xs text-slate-500 border-t border-slate-800">
+                  <div className="text-center py-3 text-xs text-slate-500 border-t border-slate-100">
                     Showing 10 of {result.top_risk_shipments.length} at-risk shipments —
-                    <button onClick={() => setShowRawShipments(true)} className="text-blue-400 hover:text-blue-300 ml-1">
+                    <button onClick={() => setShowRawShipments(true)} className="text-blue-600 hover:text-blue-700 ml-1">
                       show all
                     </button>
                   </div>

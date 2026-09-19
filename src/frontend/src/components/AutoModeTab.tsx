@@ -12,6 +12,11 @@ import {
   type AutoScenario,
 } from '../services/api';
 import DigitalTwin from './DigitalTwin';
+import {
+  Play, Pause, Square, RefreshCw, Activity,
+  AlertTriangle, CheckCircle2, Loader2, ArrowLeft,
+  BrainCircuit, MapPin, Zap, Clock,
+} from 'lucide-react';
 
 // ── Phase display helpers ──────────────────────────────────────────────────────
 
@@ -27,22 +32,16 @@ const PHASE_LABELS: Record<string, string> = {
   recording:        'Recording',
 };
 
-const PHASE_COLORS: Record<string, string> = {
-  idle:             'text-slate-400',
-  monitoring:       'text-green-400',
-  condition_change: 'text-yellow-400',
-  detection:        'text-orange-400',
-  analysis:         'text-orange-400',
-  simulation:       'text-blue-400',
-  recovery:         'text-purple-400',
-  explanation:      'text-blue-300',
-  recording:        'text-teal-400',
-};
-
-const STATUS_BADGE: Record<string, string> = {
-  idle:    'bg-slate-700 text-slate-300',
-  running: 'bg-green-900/60 text-green-300 border border-green-700',
-  paused:  'bg-yellow-900/60 text-yellow-300 border border-yellow-700',
+const PHASE_BG: Record<string, string> = {
+  idle:             'bg-slate-100 text-slate-600 border-slate-200',
+  monitoring:       'bg-emerald-50 text-emerald-700 border-emerald-200',
+  condition_change: 'bg-amber-50 text-amber-700 border-amber-200',
+  detection:        'bg-orange-50 text-orange-700 border-orange-200',
+  analysis:         'bg-orange-50 text-orange-700 border-orange-200',
+  simulation:       'bg-blue-50 text-blue-700 border-blue-200',
+  recovery:         'bg-purple-50 text-purple-700 border-purple-200',
+  explanation:      'bg-blue-50 text-blue-700 border-blue-200',
+  recording:        'bg-teal-50 text-teal-700 border-teal-200',
 };
 
 function formatConditions(conds: Record<string, unknown> | null): string {
@@ -56,12 +55,16 @@ function formatConditions(conds: Record<string, unknown> | null): string {
       const val = Number.isInteger(v) ? v.toString() : v.toFixed(2);
       return `${label}: ${val}`;
     })
-    .join('  •  ');
+    .join('  ·  ');
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function AutoModeTab() {
+interface AutoModeTabProps {
+  onNavigate?: (section: string) => void;
+}
+
+export default function AutoModeTab({ onNavigate }: AutoModeTabProps = {}) {
   // Configuration
   const [location, setLocation] = useState('Mumbai');
   const [scenario, setScenario] = useState('monsoon_buildup');
@@ -122,7 +125,6 @@ export default function AutoModeTab() {
     } else if (!isActive && pollingRef.current) {
       clearInterval(pollingRef.current);
       pollingRef.current = null;
-      // Refresh run list when stopping
       fetchRuns();
     }
     return () => {
@@ -201,38 +203,58 @@ export default function AutoModeTab() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-white">Auto Mode</h2>
-          <p className="text-slate-400 text-sm mt-1">
-            Autonomous supply-chain monitoring with causal crisis detection
-          </p>
-        </div>
-        {status && (
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${STATUS_BADGE[status.status] ?? STATUS_BADGE['idle']}`}>
-            {status.status}
+    <div className="space-y-5">
+
+      {/* Live status banner when running */}
+      {isActive && (
+        <div className={`rounded-xl border px-5 py-3 flex items-center gap-4 ${
+          isRunning
+            ? 'bg-emerald-50 border-emerald-200'
+            : 'bg-amber-50 border-amber-200'
+        }`}>
+          {isRunning
+            ? <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+            : <span className="w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0" />
+          }
+          <div className="flex-1 min-w-0">
+            <span className={`text-sm font-semibold ${isRunning ? 'text-emerald-800' : 'text-amber-800'}`}>
+              {isRunning ? 'Autonomous Monitoring Active' : 'Monitoring Paused'}
+            </span>
+            <span className="text-xs ml-3 text-slate-500">
+              {status?.location} · {status?.scenario.replace(/_/g, ' ')} · {status?.total_cycles} cycles · {status?.crises_detected} crises
+            </span>
+          </div>
+          <span className={`text-xs font-semibold border rounded-full px-2.5 py-0.5 uppercase tracking-wide ${
+            isRunning
+              ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+              : 'bg-amber-100 text-amber-700 border-amber-200'
+          }`}>
+            {status?.status}
           </span>
-        )}
-      </div>
+        </div>
+      )}
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 text-red-300 text-sm">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm flex items-center gap-3">
+          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
           {error}
         </div>
       )}
 
       {/* Two-column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {/* ── Left: Configuration + Controls ─────────────────────────────── */}
         <div className="space-y-4">
 
           {/* Configuration card */}
           <div className="card">
-            <div className="card-header">
-              <h3 className="font-semibold text-white">Configuration</h3>
+            <div className="card-header flex items-center gap-2">
+              <Activity className="w-4 h-4 text-blue-600" />
+              <h3 className="text-sm font-semibold text-slate-800">Configuration</h3>
+              {isActive && (
+                <span className="ml-auto text-xs text-slate-400 italic">Stop monitoring to change</span>
+              )}
             </div>
             <div className="card-body space-y-4">
 
@@ -278,8 +300,8 @@ export default function AutoModeTab() {
                   }
                 </select>
                 {scenarios.find(s => s.name === scenario) && (
-                  <p className="text-xs text-slate-500 mt-1">
-                    {scenarios.find(s => s.name === scenario)!.steps} steps per cycle
+                  <p className="text-xs text-slate-400 mt-1">
+                    {scenarios.find(s => s.name === scenario)!.steps} simulation steps per cycle
                   </p>
                 )}
               </div>
@@ -296,9 +318,10 @@ export default function AutoModeTab() {
                     onChange={e => setIntervalSecs(Math.max(5, Number(e.target.value)))}
                     disabled={isActive}
                   />
+                  <p className="text-xs text-slate-400 mt-0.5">Min 5s for demo</p>
                 </div>
                 <div>
-                  <label className="label">Max Cycles (blank = ∞)</label>
+                  <label className="label">Max Cycles</label>
                   <input
                     type="number"
                     className="input-field"
@@ -308,6 +331,7 @@ export default function AutoModeTab() {
                     onChange={e => setMaxCycles(e.target.value === '' ? '' : Number(e.target.value))}
                     disabled={isActive}
                   />
+                  <p className="text-xs text-slate-400 mt-0.5">Leave blank = ∞</p>
                 </div>
               </div>
             </div>
@@ -316,67 +340,104 @@ export default function AutoModeTab() {
           {/* Controls card */}
           <div className="card">
             <div className="card-header">
-              <h3 className="font-semibold text-white">Controls</h3>
+              <h3 className="text-sm font-semibold text-slate-800">Monitoring Controls</h3>
             </div>
-            <div className="card-body flex flex-wrap gap-3">
+            <div className="card-body">
+              <div className="flex flex-wrap gap-2.5">
+                {isIdle && (
+                  <button
+                    className="btn-primary flex items-center gap-2 text-sm"
+                    onClick={handleStart}
+                    disabled={loading}
+                  >
+                    {loading
+                      ? <Loader2 className="w-4 h-4 animate-spin" />
+                      : <Play className="w-4 h-4" />
+                    }
+                    Start Monitoring
+                  </button>
+                )}
+                {isRunning && (
+                  <button
+                    className="btn-secondary flex items-center gap-2 text-sm"
+                    onClick={handlePause}
+                    disabled={loading}
+                  >
+                    {loading
+                      ? <Loader2 className="w-4 h-4 animate-spin" />
+                      : <Pause className="w-4 h-4" />
+                    }
+                    Pause
+                  </button>
+                )}
+                {isPaused && (
+                  <button
+                    className="btn-primary flex items-center gap-2 text-sm"
+                    onClick={handleResume}
+                    disabled={loading}
+                  >
+                    {loading
+                      ? <Loader2 className="w-4 h-4 animate-spin" />
+                      : <Play className="w-4 h-4" />
+                    }
+                    Resume
+                  </button>
+                )}
+                {isActive && (
+                  <button
+                    className="flex items-center gap-2 btn-danger text-sm"
+                    onClick={handleStop}
+                    disabled={loading}
+                  >
+                    {loading
+                      ? <Loader2 className="w-4 h-4 animate-spin" />
+                      : <Square className="w-4 h-4" />
+                    }
+                    Stop
+                  </button>
+                )}
+                {!isActive && (
+                  <button
+                    className="btn-secondary flex items-center gap-2 text-sm"
+                    onClick={() => { fetchStatus(); fetchRuns(); }}
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Refresh Status
+                  </button>
+                )}
+              </div>
               {isIdle && (
-                <button
-                  className="btn-primary"
-                  onClick={handleStart}
-                  disabled={loading}
-                >
-                  ▶ Start Monitoring
-                </button>
-              )}
-              {isRunning && (
-                <button
-                  className="btn-secondary"
-                  onClick={handlePause}
-                  disabled={loading}
-                >
-                  ⏸ Pause
-                </button>
-              )}
-              {isPaused && (
-                <button
-                  className="btn-primary"
-                  onClick={handleResume}
-                  disabled={loading}
-                >
-                  ▶ Resume
-                </button>
-              )}
-              {isActive && (
-                <button
-                  className="px-4 py-2 rounded-lg text-sm font-medium bg-red-900/60 text-red-300 border border-red-700 hover:bg-red-900 transition-colors"
-                  onClick={handleStop}
-                  disabled={loading}
-                >
-                  ■ Stop
-                </button>
+                <p className="text-xs text-slate-400 mt-3">
+                  Select a location and scenario above, then click Start Monitoring to begin
+                  the autonomous causal-detection loop.
+                </p>
               )}
             </div>
           </div>
         </div>
 
-        {/* ── Right: Status Panel ─────────────────────────────────────────── */}
+        {/* ── Right: Live Status ──────────────────────────────────────────── */}
         <div className="space-y-4">
+
+          {/* Status card */}
           <div className="card">
             <div className="card-header flex items-center justify-between">
-              <h3 className="font-semibold text-white">Live Status</h3>
+              <h3 className="text-sm font-semibold text-slate-800">Live Status</h3>
               {isActive && (
-                <span className="flex items-center gap-1.5 text-xs text-green-400">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block" />
-                  Live
+                <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
+                  LIVE
                 </span>
               )}
             </div>
             <div className="card-body space-y-3 text-sm">
 
-              {/* Phase indicator */}
+              {/* Phase badge */}
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Phase</span>
-                <span className={`font-semibold ${PHASE_COLORS[phase] ?? 'text-slate-300'}`}>
+                <span className="text-slate-500 text-xs">Phase</span>
+                <span className={`text-xs font-semibold border rounded-full px-2.5 py-0.5 capitalize ${
+                  PHASE_BG[phase] ?? 'bg-slate-100 text-slate-600 border-slate-200'
+                }`}>
                   {PHASE_LABELS[phase] ?? phase}
                 </span>
               </div>
@@ -384,31 +445,40 @@ export default function AutoModeTab() {
               {status && isActive && (
                 <>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Location</span>
-                    <span className="text-white">{status.location}</span>
+                    <span className="text-slate-500 text-xs flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />Location
+                    </span>
+                    <span className="text-slate-800 font-medium text-sm">{status.location}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Scenario</span>
-                    <span className="text-white capitalize">{status.scenario.replace(/_/g, ' ')}</span>
+                    <span className="text-slate-500 text-xs">Scenario</span>
+                    <span className="text-slate-700 capitalize text-sm">{status.scenario.replace(/_/g, ' ')}</span>
+                  </div>
+                  <div className="h-px bg-slate-100" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 text-xs flex items-center gap-1">
+                      <Clock className="w-3 h-3" />Cycles
+                    </span>
+                    <span className="text-slate-800 font-mono font-semibold">{status.total_cycles}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Cycles Completed</span>
-                    <span className="text-white font-mono">{status.total_cycles}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Crises Detected</span>
-                    <span className={`font-mono font-semibold ${status.crises_detected > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                    <span className="text-slate-500 text-xs flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />Crises Detected
+                    </span>
+                    <span className={`font-mono font-semibold text-sm ${
+                      status.crises_detected > 0 ? 'text-red-600' : 'text-emerald-600'
+                    }`}>
                       {status.crises_detected}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Cycle Interval</span>
-                    <span className="text-white font-mono">{status.cycle_interval_seconds}s</span>
+                    <span className="text-slate-500 text-xs">Cycle Interval</span>
+                    <span className="text-slate-700 font-mono text-sm">{status.cycle_interval_seconds}s</span>
                   </div>
                   {status.started_at && (
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Started</span>
-                      <span className="text-slate-300 text-xs">
+                      <span className="text-slate-500 text-xs">Started</span>
+                      <span className="text-slate-500 text-xs">
                         {new Date(status.started_at).toLocaleTimeString()}
                       </span>
                     </div>
@@ -417,24 +487,28 @@ export default function AutoModeTab() {
               )}
 
               {isIdle && (
-                <p className="text-slate-500 text-xs">
-                  Configure a location and scenario above, then click Start Monitoring.
-                </p>
+                <div className="flex items-center gap-2 text-slate-400 text-xs py-2">
+                  <Activity className="w-3.5 h-3.5" />
+                  No monitoring session active. Configure and start above.
+                </div>
               )}
 
               {/* Current conditions */}
               {status?.current_conditions && isActive && (
-                <div className="border-t border-slate-700 pt-3 mt-2">
-                  <p className="text-slate-400 text-xs mb-2 font-medium uppercase tracking-wide">Current Conditions</p>
-                  <p className="text-slate-300 text-xs leading-relaxed">
+                <div className="border-t border-slate-100 pt-3 mt-1">
+                  <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wide mb-1.5">
+                    Current Conditions
+                  </p>
+                  <p className="text-xs text-slate-600 leading-relaxed">
                     {formatConditions(status.current_conditions)}
                   </p>
                 </div>
               )}
 
-              {/* Error */}
+              {/* Backend error */}
               {status?.last_error && (
-                <div className="bg-red-900/20 border border-red-800 rounded p-2 text-red-400 text-xs">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-red-600 text-xs flex items-start gap-1.5">
+                  <AlertTriangle className="w-3 h-3 flex-shrink-0 mt-0.5" />
                   Last error: {status.last_error}
                 </div>
               )}
@@ -443,36 +517,66 @@ export default function AutoModeTab() {
 
           {/* Latest crisis outcome */}
           {status?.last_outcome && (
-            <div className="card">
-              <div className="card-header">
-                <h3 className="font-semibold text-white">Latest Crisis — Cycle {status.last_outcome.cycle}</h3>
+            <div className={`card border-l-4 ${
+              status.last_outcome.crises_detected > 0 ? 'border-l-red-500' : 'border-l-emerald-500'
+            }`}>
+              <div className="card-header flex items-center gap-2">
+                {status.last_outcome.crises_detected > 0
+                  ? <AlertTriangle className="w-4 h-4 text-red-500" />
+                  : <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                }
+                <h3 className="text-sm font-semibold text-slate-800">
+                  Latest Result — Cycle {status.last_outcome.cycle}
+                </h3>
               </div>
-              <div className="card-body space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Disruptions Detected</span>
-                  <span className="text-red-400 font-semibold">{status.last_outcome.crises_detected}</span>
+              <div className="card-body space-y-2.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-slate-500">Crises Detected</span>
+                  <span className={`font-semibold text-sm ${
+                    status.last_outcome.crises_detected > 0 ? 'text-red-600' : 'text-emerald-600'
+                  }`}>
+                    {status.last_outcome.crises_detected}
+                  </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Shipments Affected</span>
-                  <span className="text-white font-mono">{status.last_outcome.affected_shipments}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-slate-500">Shipments Affected</span>
+                  <span className="text-slate-800 font-mono font-semibold">{status.last_outcome.affected_shipments}</span>
                 </div>
                 {status.last_outcome.disruption_types.length > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Types</span>
-                    <span className="text-orange-300 text-xs text-right max-w-48">
-                      {status.last_outcome.disruption_types.join(', ')}
+                  <div className="flex justify-between items-start gap-3">
+                    <span className="text-xs text-slate-500 flex-shrink-0">Disruption Types</span>
+                    <span className="text-orange-700 text-xs text-right capitalize">
+                      {status.last_outcome.disruption_types.map(t => t.replace(/_/g, ' ')).join(', ')}
                     </span>
                   </div>
                 )}
                 {status.last_outcome.recommended_strategy && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Recommended</span>
-                    <span className="text-blue-300">{status.last_outcome.recommended_strategy}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-500 flex items-center gap-1">
+                      <BrainCircuit className="w-3 h-3 text-blue-500" />
+                      AI Recommendation
+                    </span>
+                    <span className="text-blue-700 text-xs font-medium capitalize">
+                      {status.last_outcome.recommended_strategy}
+                    </span>
                   </div>
                 )}
-                {status.last_outcome.simulation_id && (
-                  <div className="border-t border-slate-700 pt-2 text-xs text-slate-500">
-                    Run ID: <span className="font-mono text-slate-400">{status.last_outcome.simulation_id.slice(0, 16)}…</span>
+                {status.last_outcome.simulation_id && onNavigate && (
+                  <div className="border-t border-slate-100 pt-2.5 flex gap-2">
+                    <button
+                      onClick={() => onNavigate('ai-recommendations')}
+                      className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      <BrainCircuit className="w-3 h-3" />
+                      AI Analysis
+                    </button>
+                    <button
+                      onClick={() => onNavigate('disruptions')}
+                      className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      <Zap className="w-3 h-3" />
+                      Disruptions
+                    </button>
                   </div>
                 )}
               </div>
@@ -487,58 +591,89 @@ export default function AutoModeTab() {
         activeLocation={status?.location}
       />
 
+      {/* Post-session navigation (when idle after running) */}
+      {!isActive && runs.length > 0 && onNavigate && (
+        <div className="flex flex-wrap items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-slate-700">Session complete — next steps</p>
+            <p className="text-xs text-slate-500 mt-0.5">Review detected disruptions or return to the overview dashboard</p>
+          </div>
+          <button
+            onClick={() => onNavigate('disruptions')}
+            className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"
+          >
+            <Zap className="w-4 h-4" />
+            View Disruptions
+          </button>
+          <button
+            onClick={() => onNavigate('overview')}
+            className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 transition-colors shadow-sm"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Return to Overview
+          </button>
+        </div>
+      )}
+
       {/* ── Session History ─────────────────────────────────────────────────── */}
       <div className="card">
         <div className="card-header flex items-center justify-between">
-          <h3 className="font-semibold text-white">Auto Mode Sessions</h3>
+          <h3 className="text-sm font-semibold text-slate-800">Session History</h3>
           <button
-            className="text-xs text-slate-400 hover:text-slate-200 transition-colors"
+            className="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1 transition-colors"
             onClick={fetchRuns}
           >
+            <RefreshCw className="w-3 h-3" />
             Refresh
           </button>
         </div>
-        <div className="card-body">
+        <div className="card-body p-0">
           {runs.length === 0 ? (
-            <p className="text-slate-500 text-sm">No Auto Mode sessions recorded yet.</p>
+            <div className="flex flex-col items-center justify-center py-10 text-slate-400">
+              <Clock className="w-8 h-8 mb-2 opacity-40" />
+              <p className="text-sm">No sessions recorded yet</p>
+              <p className="text-xs mt-0.5">Start monitoring to create the first session</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-slate-400 text-xs uppercase tracking-wide border-b border-slate-700">
-                    <th className="pb-2 pr-4">Session</th>
-                    <th className="pb-2 pr-4">Location</th>
-                    <th className="pb-2 pr-4">Status</th>
-                    <th className="pb-2 pr-4">Cycles</th>
-                    <th className="pb-2 pr-4">Crises</th>
-                    <th className="pb-2">Started</th>
+                  <tr className="border-b border-slate-200 bg-slate-50">
+                    <th className="text-left text-slate-500 font-medium px-4 py-2.5 text-xs uppercase tracking-wide">Session</th>
+                    <th className="text-left text-slate-500 font-medium px-4 py-2.5 text-xs uppercase tracking-wide">Location</th>
+                    <th className="text-left text-slate-500 font-medium px-4 py-2.5 text-xs uppercase tracking-wide">Status</th>
+                    <th className="text-right text-slate-500 font-medium px-4 py-2.5 text-xs uppercase tracking-wide">Cycles</th>
+                    <th className="text-right text-slate-500 font-medium px-4 py-2.5 text-xs uppercase tracking-wide">Crises</th>
+                    <th className="text-right text-slate-500 font-medium px-4 py-2.5 text-xs uppercase tracking-wide">Started</th>
                   </tr>
                 </thead>
                 <tbody>
                   {runs.map(run => (
-                    <tr key={run.run_id} className="border-b border-slate-800 hover:bg-slate-800/40">
-                      <td className="py-2 pr-4 font-mono text-xs text-slate-400">
+                    <tr key={run.run_id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-2.5 font-mono text-xs text-slate-500">
                         {run.run_id.slice(0, 12)}…
                       </td>
-                      <td className="py-2 pr-4 text-white">{run.monitored_location ?? '—'}</td>
-                      <td className="py-2 pr-4">
-                        <span className={`px-2 py-0.5 rounded text-xs ${
-                          run.status === 'stopped' ? 'bg-slate-700 text-slate-400' :
-                          run.status === 'monitoring' ? 'bg-green-900/50 text-green-400' :
-                          run.status === 'paused' ? 'bg-yellow-900/50 text-yellow-400' :
-                          run.status === 'error' ? 'bg-red-900/50 text-red-400' :
-                          'bg-slate-700 text-slate-400'
+                      <td className="px-4 py-2.5 text-slate-700 font-medium">{run.monitored_location ?? '—'}</td>
+                      <td className="px-4 py-2.5">
+                        <span className={`text-xs font-medium border rounded-full px-2 py-0.5 ${
+                          run.status === 'stopped'    ? 'bg-slate-100 text-slate-600 border-slate-200' :
+                          run.status === 'monitoring' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                          run.status === 'paused'     ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                          run.status === 'error'      ? 'bg-red-50 text-red-700 border-red-200' :
+                          'bg-slate-100 text-slate-600 border-slate-200'
                         }`}>
                           {run.status}
                         </span>
                       </td>
-                      <td className="py-2 pr-4 text-white font-mono">{run.total_cycles}</td>
-                      <td className="py-2 pr-4">
-                        <span className={`font-mono ${run.total_crises_detected > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                      <td className="px-4 py-2.5 text-right text-slate-700 font-mono">{run.total_cycles}</td>
+                      <td className="px-4 py-2.5 text-right">
+                        <span className={`font-mono font-semibold ${
+                          run.total_crises_detected > 0 ? 'text-red-600' : 'text-emerald-600'
+                        }`}>
                           {run.total_crises_detected}
                         </span>
                       </td>
-                      <td className="py-2 text-slate-400 text-xs">
+                      <td className="px-4 py-2.5 text-right text-slate-400 text-xs">
                         {run.started_at ? new Date(run.started_at).toLocaleString() : '—'}
                       </td>
                     </tr>

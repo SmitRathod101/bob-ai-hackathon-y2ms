@@ -117,6 +117,13 @@ interface Props {
   /** Optional: current simulation location to highlight node */
   activeLocation?: string;
   compact?: boolean;
+  /**
+   * When true the component renders as a bare SVG panel (no card chrome).
+   * Use this when the parent already provides a card + header.
+   */
+  headerless?: boolean;
+  /** Optional: callback when a node is clicked — receives node name */
+  onNodeClick?: (nodeName: string) => void;
 }
 
 export default function DigitalTwin({
@@ -125,6 +132,8 @@ export default function DigitalTwin({
   alternativeRouteIds = [],
   activeLocation,
   compact = false,
+  headerless = false,
+  onNodeClick,
 }: Props) {
   const [twinState, setTwinState] = useState<TwinState | null>(null);
   const [loading, setLoading] = useState(true);
@@ -331,52 +340,9 @@ export default function DigitalTwin({
 
   const svgHeight = compact ? 380 : H;
 
-  return (
-    <div className="card overflow-hidden">
-      {/* Header */}
-      <div className="card-header flex items-center justify-between py-3">
-        <div className="flex items-center gap-3">
-          <Activity className="w-4 h-4 text-blue-400" />
-          <h3 className="text-sm font-semibold text-slate-200">Digital Twin — Live Network</h3>
-          <span className="text-xs font-medium px-2 py-0.5 rounded-full border"
-            style={{ color: healthColor, borderColor: healthColor + '55', background: healthColor + '15' }}>
-            {healthLabel}
-          </span>
-          {twinState?.auto_mode.status === 'running' && (
-            <span className="text-xs bg-green-900/40 text-green-300 border border-green-700 px-2 py-0.5 rounded-full animate-pulse">
-              AUTO MONITORING
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          {twinState && (
-            <div className="flex items-center gap-3 text-xs text-slate-500">
-              <span>{twinState.stats.total_connections} routes</span>
-              {twinState.stats.disrupted_connections > 0 && (
-                <span className="text-red-400 font-medium">
-                  {twinState.stats.disrupted_connections} disrupted
-                </span>
-              )}
-              {twinState.stats.alternative_routes_active > 0 && (
-                <span className="text-purple-400 font-medium">
-                  {twinState.stats.alternative_routes_active} alt routes
-                </span>
-              )}
-              <span>{twinState.stats.delayed_shipments} delayed</span>
-            </div>
-          )}
-          <button
-            onClick={loadState}
-            className="text-slate-500 hover:text-slate-300 transition-colors"
-            title="Refresh"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {/* SVG Network Canvas */}
-      <div className="relative" style={{ background: '#0a1628' }}>
+  /** The SVG canvas + tooltip — shared between card and headerless modes */
+  const svgCanvas = (
+    <div className="relative flex-1 min-h-0 overflow-hidden" style={{ background: '#0a1628' }}>
         {loading && !twinState && (
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="text-center">
@@ -388,7 +354,8 @@ export default function DigitalTwin({
 
         <svg
           viewBox={`0 0 ${W} ${svgHeight}`}
-          style={{ width: '100%', height: svgHeight, display: 'block' }}
+          style={{ width: '100%', height: '100%', minHeight: svgHeight, display: 'block' }}
+          preserveAspectRatio="xMidYMid meet"
           onMouseLeave={() => setTooltip(null)}
         >
           {/* India outline (simplified grid for context) */}
@@ -490,11 +457,12 @@ export default function DigitalTwin({
 
             return (
               <g key={name}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: onNodeClick ? 'pointer' : 'default' }}
+                onClick={() => onNodeClick?.(name)}
                 onMouseEnter={(e) => {
                   const parentRect = (e.currentTarget.closest('.relative') as HTMLElement)?.getBoundingClientRect();
                   setTooltip({
-                    text: `${isDisrupted ? '⛔ ' : ''}${name} · ${Math.round(congestion * 100)}% congestion${isDisrupted ? ' · DISRUPTED' : ''}`,
+                    text: `${isDisrupted ? '⛔ ' : ''}${name} · ${Math.round(congestion * 100)}% congestion${isDisrupted ? ' · DISRUPTED' : ''}${onNodeClick ? ' · Click to inspect' : ''}`,
                     x: e.clientX - (parentRect?.left ?? 0),
                     y: e.clientY - (parentRect?.top ?? 0),
                   });
@@ -608,53 +576,110 @@ export default function DigitalTwin({
             {tooltip.text}
           </div>
         )}
-      </div>
+    </div>
+  );
 
-      {/* Status bar */}
-      {twinState && !compact && (
-        <div className="px-4 py-3 border-t border-slate-700/50 flex items-center gap-6 text-xs">
-          <StatusPill
-            icon={<Truck className="w-3 h-3" />}
-            label={`${twinState.stats.delayed_shipments} delayed shipments`}
-            color={twinState.stats.delayed_shipments > 0 ? 'text-orange-400' : 'text-green-400'}
-          />
-          {twinState.stats.disrupted_connections > 0 && (
-            <StatusPill
-              icon={<AlertTriangle className="w-3 h-3" />}
-              label={`${twinState.stats.disrupted_connections} disrupted connections`}
-              color="text-red-400"
-            />
-          )}
-          {twinState.stats.alternative_routes_active > 0 && (
-            <StatusPill
-              icon={<ArrowUpRight className="w-3 h-3" />}
-              label={`${twinState.stats.alternative_routes_active} alt routes active`}
-              color="text-purple-400"
-            />
-          )}
-          {twinState.auto_mode.status === 'running' && (
-            <StatusPill
-              icon={<Zap className="w-3 h-3" />}
-              label={`Auto: ${twinState.auto_mode.phase} · ${twinState.auto_mode.crises_detected} crises`}
-              color="text-green-400"
-            />
-          )}
-          {twinState.stats.disrupted_connections === 0 && twinState.stats.delayed_shipments === 0 && (
-            <StatusPill
-              icon={<CheckCircle2 className="w-3 h-3" />}
-              label="All routes operational"
-              color="text-green-400"
-            />
-          )}
-          {twinState.simulation.active && twinState.simulation.strategy && (
-            <StatusPill
-              icon={<Shield className="w-3 h-3" />}
-              label={`Strategy: ${twinState.simulation.strategy}`}
-              color="text-blue-400"
-            />
+  /** Status bar strip — only shown in full card mode */
+  const statusBar = twinState && !compact && !headerless ? (
+    <div className="px-4 py-2.5 border-t border-slate-200 flex items-center gap-6 text-xs flex-shrink-0">
+      <StatusPill
+        icon={<Truck className="w-3 h-3" />}
+        label={`${twinState.stats.delayed_shipments} delayed shipments`}
+        color={twinState.stats.delayed_shipments > 0 ? 'text-orange-600' : 'text-emerald-600'}
+      />
+      {twinState.stats.disrupted_connections > 0 && (
+        <StatusPill
+          icon={<AlertTriangle className="w-3 h-3" />}
+          label={`${twinState.stats.disrupted_connections} disrupted connections`}
+          color="text-red-600"
+        />
+      )}
+      {twinState.stats.alternative_routes_active > 0 && (
+        <StatusPill
+          icon={<ArrowUpRight className="w-3 h-3" />}
+          label={`${twinState.stats.alternative_routes_active} alt routes active`}
+          color="text-purple-600"
+        />
+      )}
+      {twinState.auto_mode.status === 'running' && (
+        <StatusPill
+          icon={<Zap className="w-3 h-3" />}
+          label={`Auto: ${twinState.auto_mode.phase} · ${twinState.auto_mode.crises_detected} crises`}
+          color="text-emerald-600"
+        />
+      )}
+      {twinState.stats.disrupted_connections === 0 && twinState.stats.delayed_shipments === 0 && (
+        <StatusPill
+          icon={<CheckCircle2 className="w-3 h-3" />}
+          label="All routes operational"
+          color="text-emerald-600"
+        />
+      )}
+      {twinState.simulation.active && twinState.simulation.strategy && (
+        <StatusPill
+          icon={<Shield className="w-3 h-3" />}
+          label={`Strategy: ${twinState.simulation.strategy}`}
+          color="text-blue-600"
+        />
+      )}
+    </div>
+  ) : null;
+
+  // ── Headerless mode: just the canvas (parent supplies card + header) ──────────
+  if (headerless) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden rounded-b-xl" style={{ background: '#0a1628' }}>
+        {svgCanvas}
+      </div>
+    );
+  }
+
+  // ── Full card mode (default) ──────────────────────────────────────────────────
+  return (
+    <div className="card overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="card-header flex items-center justify-between py-3 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <Activity className="w-4 h-4 text-blue-500" />
+          <h3 className="text-sm font-semibold text-slate-800">Digital Twin — Live Network</h3>
+          <span className="text-xs font-medium px-2 py-0.5 rounded-full border"
+            style={{ color: healthColor, borderColor: healthColor + '55', background: healthColor + '15' }}>
+            {healthLabel}
+          </span>
+          {twinState?.auto_mode.status === 'running' && (
+            <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full animate-pulse font-semibold">
+              AUTO MONITORING
+            </span>
           )}
         </div>
-      )}
+        <div className="flex items-center gap-3">
+          {twinState && (
+            <div className="flex items-center gap-3 text-xs text-slate-500">
+              <span>{twinState.stats.total_connections} routes</span>
+              {twinState.stats.disrupted_connections > 0 && (
+                <span className="text-red-600 font-medium">
+                  {twinState.stats.disrupted_connections} disrupted
+                </span>
+              )}
+              {twinState.stats.alternative_routes_active > 0 && (
+                <span className="text-purple-600 font-medium">
+                  {twinState.stats.alternative_routes_active} alt routes
+                </span>
+              )}
+              <span>{twinState.stats.delayed_shipments} delayed</span>
+            </div>
+          )}
+          <button
+            onClick={loadState}
+            className="text-slate-400 hover:text-slate-600 transition-colors"
+            title="Refresh"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+      {svgCanvas}
+      {statusBar}
     </div>
   );
 }

@@ -50,13 +50,13 @@ export default function ImpactSummaryPanel({ impact }: ImpactSummaryPanelProps) 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
       {metrics.map(m => (
-        <div key={m.label} className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">
+        <div key={m.label} className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             {m.icon}
-            <span className="text-xs text-slate-400">{m.label}</span>
+            <span className="text-xs text-gray-500">{m.label}</span>
           </div>
-          <div className="text-xl font-bold text-white">{m.value}</div>
-          <div className="text-xs text-slate-500 mt-0.5">{m.sub}</div>
+          <div className="text-xl font-bold text-gray-900">{m.value}</div>
+          <div className="text-xs text-gray-400 mt-0.5">{m.sub}</div>
         </div>
       ))}
     </div>

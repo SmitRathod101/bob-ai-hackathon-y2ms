@@ -34,8 +34,8 @@ export default function HistoryTab({ recentSimulations }: HistoryTabProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white">Simulation History</h2>
-          <p className="text-slate-400 text-sm mt-0.5">All previous crisis simulations</p>
+          <h2 className="text-xl font-semibold text-gray-900">Simulation History</h2>
+          <p className="text-gray-500 text-sm mt-0.5">All previous crisis simulations</p>
         </div>
         <button onClick={load} className="btn-secondary flex items-center gap-2 text-sm">
           <RefreshCw className="w-4 h-4" />
@@ -62,25 +62,25 @@ export default function HistoryTab({ recentSimulations }: HistoryTabProps) {
           <div className="card-body p-0 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left text-slate-400 font-medium px-5 py-3">Scenario</th>
-                  <th className="text-left text-slate-400 font-medium px-4 py-3">Type</th>
-                  <th className="text-center text-slate-400 font-medium px-4 py-3">Severity</th>
-                  <th className="text-right text-slate-400 font-medium px-4 py-3">Affected</th>
-                  <th className="text-right text-slate-400 font-medium px-4 py-3">Cargo Exposed</th>
-                  <th className="text-right text-slate-400 font-medium px-4 py-3">Avg Delay</th>
-                  <th className="text-right text-slate-400 font-medium px-4 py-3">Recommended</th>
-                  <th className="text-right text-slate-400 font-medium px-4 py-3">Date</th>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="text-left text-gray-500 font-medium px-5 py-3">Scenario</th>
+                  <th className="text-left text-gray-500 font-medium px-4 py-3">Type</th>
+                  <th className="text-center text-gray-500 font-medium px-4 py-3">Severity</th>
+                  <th className="text-right text-gray-500 font-medium px-4 py-3">Affected</th>
+                  <th className="text-right text-gray-500 font-medium px-4 py-3">Cargo Exposed</th>
+                  <th className="text-right text-gray-500 font-medium px-4 py-3">Avg Delay</th>
+                  <th className="text-right text-gray-500 font-medium px-4 py-3">Recommended</th>
+                  <th className="text-right text-gray-500 font-medium px-4 py-3">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {sims.map(sim => (
-                  <tr key={sim.simulation_id} className="border-b border-slate-800 hover:bg-slate-800/50">
+                  <tr key={sim.simulation_id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="px-5 py-3">
-                      <div className="text-slate-200 font-medium">{sim.scenario_name || sim.location}</div>
-                      <div className="text-slate-500 text-xs font-mono">{sim.simulation_id.slice(0, 8)}…</div>
+                      <div className="text-gray-800 font-medium">{sim.scenario_name || sim.location}</div>
+                      <div className="text-gray-400 text-xs font-mono">{sim.simulation_id.slice(0, 8)}…</div>
                     </td>
-                    <td className="px-4 py-3 text-slate-400 text-xs capitalize">
+                    <td className="px-4 py-3 text-gray-500 text-xs capitalize">
                       {sim.disruption_type.replace(/_/g, ' ')}
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -91,19 +91,19 @@ export default function HistoryTab({ recentSimulations }: HistoryTabProps) {
                         {sim.severity}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right text-slate-300 font-medium">
+                    <td className="px-4 py-3 text-right text-gray-700 font-medium">
                       {sim.total_affected_shipments}
                     </td>
-                    <td className="px-4 py-3 text-right text-slate-300">
+                    <td className="px-4 py-3 text-right text-gray-700">
                       {formatCurrency(sim.total_cargo_value_exposed)}
                     </td>
-                    <td className="px-4 py-3 text-right text-slate-300">
+                    <td className="px-4 py-3 text-right text-gray-700">
                       {formatDelay(sim.average_delay_hours)}
                     </td>
-                    <td className="px-4 py-3 text-right text-blue-400 capitalize">
+                    <td className="px-4 py-3 text-right text-blue-600 font-medium capitalize">
                       {sim.recommended_strategy ?? '—'}
                     </td>
-                    <td className="px-4 py-3 text-right text-slate-500 text-xs">
+                    <td className="px-4 py-3 text-right text-gray-400 text-xs">
                       {sim.created_at ? new Date(sim.created_at).toLocaleDateString('en-IN') : '—'}
                     </td>
                   </tr>

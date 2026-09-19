@@ -26,7 +26,7 @@ function Delta({
 
   if (noChange) {
     return (
-      <div className="flex items-center gap-1 text-slate-400">
+      <div className="flex items-center gap-1 text-gray-400">
         <Minus className="w-3 h-3" />
         <span className="text-xs">No change</span>
       </div>
@@ -34,13 +34,13 @@ function Delta({
   }
 
   return (
-    <div className={`flex items-center gap-1 text-xs font-medium ${improved ? 'text-green-400' : 'text-red-400'}`}>
+    <div className={`flex items-center gap-1 text-xs font-medium ${improved ? 'text-green-600' : 'text-red-600'}`}>
       {increased
         ? <TrendingUp className="w-3.5 h-3.5" />
         : <TrendingDown className="w-3.5 h-3.5" />
       }
       <span>{increased ? '+' : '-'}{pct}%</span>
-      <span className="text-slate-500 font-normal">
+      <span className="text-gray-400 font-normal">
         ({formatter(Math.abs(diff))})
       </span>
     </div>
@@ -56,23 +56,22 @@ export default function ScenarioCompareBanner({ previous, current }: ScenarioCom
   const strategyChanged = prevRec?.strategy_type !== currRec?.strategy_type;
 
   return (
-    <div className="bg-blue-900/20 border border-blue-700/50 rounded-xl p-5">
+    <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
           <TrendingUp className="w-4 h-4 text-white" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-blue-300">What-If Comparison — Scenario Changed</h3>
-          <p className="text-xs text-slate-400">
-            Comparing <strong className="text-slate-300">{previous.scenario.location} {previous.scenario.duration_hours}h {previous.scenario.severity}</strong>
+          <h3 className="text-sm font-semibold text-blue-700">What-If Comparison — Scenario Changed</h3>
+          <p className="text-xs text-gray-500">
+            Comparing <strong className="text-gray-700">{previous.scenario.location} {previous.scenario.duration_hours}h {previous.scenario.severity}</strong>
             <ArrowRight className="w-3 h-3 inline mx-1" />
-            <strong className="text-slate-300">{current.scenario.location} {current.scenario.duration_hours}h {current.scenario.severity}</strong>
+            <strong className="text-gray-700">{current.scenario.location} {current.scenario.duration_hours}h {current.scenario.severity}</strong>
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* Affected Shipments */}
         <CompareCell
           label="Affected Shipments"
           prev={prevImp.total_affected_shipments}
@@ -80,8 +79,6 @@ export default function ScenarioCompareBanner({ previous, current }: ScenarioCom
           formatter={v => String(Math.round(v))}
           lowerIsBetter={true}
         />
-
-        {/* Average Delay */}
         <CompareCell
           label="Average Delay"
           prev={prevImp.average_delay_hours}
@@ -89,8 +86,6 @@ export default function ScenarioCompareBanner({ previous, current }: ScenarioCom
           formatter={formatDelay}
           lowerIsBetter={true}
         />
-
-        {/* Cargo Exposed */}
         <CompareCell
           label="Cargo Exposed"
           prev={prevImp.total_cargo_value_exposed}
@@ -98,8 +93,6 @@ export default function ScenarioCompareBanner({ previous, current }: ScenarioCom
           formatter={formatCurrency}
           lowerIsBetter={true}
         />
-
-        {/* Cold-Chain at Risk */}
         <CompareCell
           label="Cold-Chain at Risk"
           prev={prevImp.cold_chain_at_risk}
@@ -109,21 +102,20 @@ export default function ScenarioCompareBanner({ previous, current }: ScenarioCom
         />
       </div>
 
-      {/* Strategy change notice */}
       {strategyChanged && prevRec && currRec && (
-        <div className="mt-4 pt-4 border-t border-blue-700/30 flex items-center gap-3 text-sm">
-          <span className="text-slate-400">Recommended strategy changed:</span>
+        <div className="mt-4 pt-4 border-t border-blue-200 flex items-center gap-3 text-sm">
+          <span className="text-gray-600">Recommended strategy changed:</span>
           <span className="badge badge-medium capitalize">{prevRec.strategy_type}</span>
-          <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+          <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
           <span className="badge badge-high capitalize">{currRec.strategy_type}</span>
-          <span className="text-slate-500 text-xs ml-1">
+          <span className="text-gray-400 text-xs ml-1">
             (due to changed scenario parameters)
           </span>
         </div>
       )}
       {!strategyChanged && prevRec && (
-        <div className="mt-4 pt-4 border-t border-blue-700/30 text-xs text-slate-400">
-          Recommended strategy unchanged: <span className="text-blue-400 capitalize">{prevRec.strategy_type}</span>
+        <div className="mt-4 pt-4 border-t border-blue-200 text-xs text-gray-500">
+          Recommended strategy unchanged: <span className="text-blue-600 font-medium capitalize">{prevRec.strategy_type}</span>
           {' — but cost/delay figures have changed. See updated strategy cards below.'}
         </div>
       )}
@@ -141,12 +133,12 @@ function CompareCell({
   lowerIsBetter: boolean;
 }) {
   return (
-    <div className="bg-slate-800/60 rounded-lg p-3">
-      <p className="text-xs text-slate-400 mb-2">{label}</p>
+    <div className="bg-white border border-blue-100 rounded-lg p-3 shadow-sm">
+      <p className="text-xs text-gray-500 mb-2">{label}</p>
       <div className="flex items-baseline gap-2 mb-1">
-        <span className="text-slate-500 text-sm line-through">{formatter(prev)}</span>
-        <ArrowRight className="w-3 h-3 text-slate-600 flex-shrink-0" />
-        <span className="text-white font-bold">{formatter(curr)}</span>
+        <span className="text-gray-400 text-sm line-through">{formatter(prev)}</span>
+        <ArrowRight className="w-3 h-3 text-gray-300 flex-shrink-0" />
+        <span className="text-gray-900 font-bold">{formatter(curr)}</span>
       </div>
       <Delta prev={prev} curr={curr} formatter={formatter} lowerIsBetter={lowerIsBetter} />
     </div>

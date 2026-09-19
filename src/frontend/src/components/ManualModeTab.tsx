@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Settings, Zap, AlertTriangle, Loader2, RefreshCw,
   Plus, Trash2, Network, Activity, ChevronDown, ChevronUp,
-  Thermometer, Cloud, Gauge, Truck, Anchor, Wind
+  Thermometer, Cloud, Gauge, Truck, Anchor, Wind,
+  ArrowLeft, BrainCircuit,
 } from 'lucide-react';
 import {
   runManualSimulation, getConnections, getNodes,
@@ -56,9 +57,9 @@ const emptyDisruption = (): DirectDisruptionInput => ({
 });
 
 const severityColor = (s: string) =>
-  s === 'high' ? 'text-red-400 bg-red-900/30 border-red-700' :
-  s === 'medium' ? 'text-yellow-400 bg-yellow-900/30 border-yellow-700' :
-  'text-green-400 bg-green-900/30 border-green-700';
+  s === 'high' ? 'text-red-700 bg-red-50 border-red-200' :
+  s === 'medium' ? 'text-amber-700 bg-amber-50 border-amber-200' :
+  'text-green-700 bg-green-50 border-green-200';
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -75,10 +76,10 @@ function ConditionEditor({
   const set = (key: string, value: unknown) => onChange({ ...condition, [key]: value });
 
   return (
-    <div className="border border-slate-700 rounded-lg p-4 space-y-3 bg-slate-800/50">
+    <div className="border border-gray-200 rounded-lg p-4 space-y-3 bg-gray-50">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-          <Cloud className="w-3.5 h-3.5 text-blue-400" />
+        <span className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
+          <Cloud className="w-3.5 h-3.5 text-blue-500" />
           Condition #{index + 1}
         </span>
         <button onClick={onRemove} className="text-slate-500 hover:text-red-400">
@@ -116,8 +117,8 @@ function ConditionEditor({
         {/* Rainfall */}
         <div>
           <label className="label text-xs flex items-center gap-1">
-            <Cloud className="w-3 h-3 text-blue-400" />
-            Rainfall: <strong className="text-white ml-1">
+            <Cloud className="w-3 h-3 text-blue-500" />
+            Rainfall: <strong className="text-gray-800 ml-1">
               {condition.rainfall_mm != null ? `${condition.rainfall_mm} mm/h` : '—'}
             </strong>
           </label>
@@ -125,16 +126,16 @@ function ConditionEditor({
             value={condition.rainfall_mm ?? 0}
             onChange={e => set('rainfall_mm', Number(e.target.value) || undefined)}
             className="w-full accent-blue-500" />
-          <div className="flex justify-between text-slate-600 text-xs">
-            <span>0</span><span className="text-yellow-500">50mm↑ risk</span><span>200</span>
+          <div className="flex justify-between text-gray-400 text-xs">
+            <span>0</span><span className="text-amber-600">50mm↑ risk</span><span>200</span>
           </div>
         </div>
 
         {/* Temperature */}
         <div>
           <label className="label text-xs flex items-center gap-1">
-            <Thermometer className="w-3 h-3 text-orange-400" />
-            Temperature: <strong className="text-white ml-1">
+            <Thermometer className="w-3 h-3 text-orange-500" />
+            Temperature: <strong className="text-gray-800 ml-1">
               {condition.temperature_c != null ? `${condition.temperature_c}°C` : '—'}
             </strong>
           </label>
@@ -142,7 +143,7 @@ function ConditionEditor({
             value={condition.temperature_c ?? 25}
             onChange={e => set('temperature_c', Number(e.target.value))}
             className="w-full accent-orange-500" />
-          <div className="flex justify-between text-slate-600 text-xs">
+          <div className="flex justify-between text-gray-400 text-xs">
             <span>-10°C</span><span className="text-red-500">42°+risk</span><span>55°C</span>
           </div>
         </div>
@@ -150,8 +151,8 @@ function ConditionEditor({
         {/* Traffic */}
         <div>
           <label className="label text-xs flex items-center gap-1">
-            <Truck className="w-3 h-3 text-yellow-400" />
-            Traffic: <strong className="text-white ml-1">
+            <Truck className="w-3 h-3 text-amber-500" />
+            Traffic: <strong className="text-gray-800 ml-1">
               {condition.traffic_level != null ? `${Math.round(condition.traffic_level * 100)}%` : '—'}
             </strong>
           </label>
@@ -159,16 +160,16 @@ function ConditionEditor({
             value={Math.round((condition.traffic_level ?? 0) * 100)}
             onChange={e => set('traffic_level', Number(e.target.value) / 100)}
             className="w-full accent-yellow-500" />
-          <div className="flex justify-between text-slate-600 text-xs">
-            <span>0%</span><span className="text-yellow-500">70%↑ risk</span><span>100%</span>
+          <div className="flex justify-between text-gray-400 text-xs">
+            <span>0%</span><span className="text-amber-600">70%↑ risk</span><span>100%</span>
           </div>
         </div>
 
         {/* Road condition */}
         <div>
           <label className="label text-xs flex items-center gap-1">
-            <Gauge className="w-3 h-3 text-purple-400" />
-            Road Condition: <strong className="text-white ml-1">
+            <Gauge className="w-3 h-3 text-purple-500" />
+            Road Condition: <strong className="text-gray-800 ml-1">
               {condition.road_condition != null ? `${Math.round(condition.road_condition * 100)}%` : '—'}
             </strong>
           </label>
@@ -176,7 +177,7 @@ function ConditionEditor({
             value={Math.round((condition.road_condition ?? 100) * 100)}
             onChange={e => set('road_condition', Number(e.target.value) / 100)}
             className="w-full accent-purple-500" />
-          <div className="flex justify-between text-slate-600 text-xs">
+          <div className="flex justify-between text-gray-400 text-xs">
             <span>0% bad</span><span className="text-red-500">≤40% risk</span><span>100% perfect</span>
           </div>
         </div>
@@ -184,8 +185,8 @@ function ConditionEditor({
         {/* Port congestion */}
         <div>
           <label className="label text-xs flex items-center gap-1">
-            <Anchor className="w-3 h-3 text-cyan-400" />
-            Port Congestion: <strong className="text-white ml-1">
+            <Anchor className="w-3 h-3 text-cyan-600" />
+            Port Congestion: <strong className="text-gray-800 ml-1">
               {condition.port_congestion != null ? `${Math.round(condition.port_congestion * 100)}%` : '—'}
             </strong>
           </label>
@@ -193,16 +194,16 @@ function ConditionEditor({
             value={Math.round((condition.port_congestion ?? 0) * 100)}
             onChange={e => set('port_congestion', Number(e.target.value) / 100)}
             className="w-full accent-cyan-500" />
-          <div className="flex justify-between text-slate-600 text-xs">
-            <span>0%</span><span className="text-yellow-500">70%↑ risk</span><span>100%</span>
+          <div className="flex justify-between text-gray-400 text-xs">
+            <span>0%</span><span className="text-amber-600">70%↑ risk</span><span>100%</span>
           </div>
         </div>
 
         {/* Weather severity */}
         <div>
           <label className="label text-xs flex items-center gap-1">
-            <Wind className="w-3 h-3 text-teal-400" />
-            Weather Severity: <strong className="text-white ml-1">
+            <Wind className="w-3 h-3 text-teal-600" />
+            Weather Severity: <strong className="text-gray-800 ml-1">
               {condition.weather_severity != null ? `${Math.round(condition.weather_severity * 100)}%` : '—'}
             </strong>
           </label>
@@ -210,7 +211,7 @@ function ConditionEditor({
             value={Math.round((condition.weather_severity ?? 0) * 100)}
             onChange={e => set('weather_severity', Number(e.target.value) / 100)}
             className="w-full accent-teal-500" />
-          <div className="flex justify-between text-slate-600 text-xs">
+          <div className="flex justify-between text-gray-400 text-xs">
             <span>0%</span><span className="text-red-500">75%↑ severe</span><span>100%</span>
           </div>
         </div>
@@ -233,9 +234,9 @@ function DisruptionEditor({
   const set = (key: string, value: unknown) => onChange({ ...disruption, [key]: value });
 
   return (
-    <div className="border border-orange-800/50 rounded-lg p-4 space-y-3 bg-orange-950/20">
+    <div className="border border-orange-200 rounded-lg p-4 space-y-3 bg-orange-50">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-orange-300 flex items-center gap-1.5">
+        <span className="text-xs font-semibold text-orange-700 flex items-center gap-1.5">
           <AlertTriangle className="w-3.5 h-3.5" />
           Disruption #{index + 1}
         </span>
@@ -283,21 +284,21 @@ function DisruptionEditor({
               <button key={s} onClick={() => set('severity', s)}
                 className={`flex-1 py-1 rounded text-xs font-medium capitalize transition-colors ${
                   disruption.severity === s
-                    ? s === 'high' ? 'bg-red-600 text-white' : s === 'medium' ? 'bg-yellow-600 text-white' : 'bg-green-600 text-white'
-                    : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                    ? s === 'high' ? 'bg-red-600 text-white' : s === 'medium' ? 'bg-amber-500 text-white' : 'bg-green-600 text-white'
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
                 }`}>{s}</button>
             ))}
           </div>
         </div>
         <div>
-          <label className="label text-xs">Duration: <strong className="text-white">{disruption.duration_hours}h</strong></label>
+          <label className="label text-xs">Duration: <strong className="text-gray-800">{disruption.duration_hours}h</strong></label>
           <input type="range" min={1} max={168} step={1}
             value={disruption.duration_hours}
             onChange={e => set('duration_hours', Number(e.target.value))}
             className="w-full accent-orange-500" />
         </div>
         <div>
-          <label className="label text-xs">Capacity Blocked: <strong className="text-white">{Math.round(disruption.capacity_reduction * 100)}%</strong></label>
+          <label className="label text-xs">Capacity Blocked: <strong className="text-gray-800">{Math.round(disruption.capacity_reduction * 100)}%</strong></label>
           <input type="range" min={10} max={100} step={10}
             value={Math.round(disruption.capacity_reduction * 100)}
             onChange={e => set('capacity_reduction', Number(e.target.value) / 100)}
@@ -321,7 +322,12 @@ function DisruptionEditor({
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export default function ManualModeTab() {
+interface ManualModeTabProps {
+  onSimulationComplete?: () => void;
+  onNavigate?: (section: string) => void;
+}
+
+export default function ManualModeTab({ onSimulationComplete, onNavigate }: ManualModeTabProps = {}) {
   const [conditions, setConditions] = useState<ConditionInput[]>([emptyCondition()]);
   const [disruptions, setDisruptions] = useState<DirectDisruptionInput[]>([]);
   const [interruptConnIds, setInterruptConnIds] = useState<string[]>([]);
@@ -370,6 +376,7 @@ export default function ManualModeTab() {
       };
       const res = await runManualSimulation(req);
       setResult(res);
+      onSimulationComplete?.();
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 200);
@@ -403,11 +410,11 @@ export default function ManualModeTab() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-            <Settings className="w-5 h-5 text-purple-400" />
+          <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+            <Settings className="w-5 h-5 text-purple-600" />
             Manual Mode
           </h2>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <p className="text-gray-500 text-sm mt-0.5">
             Manipulate environmental conditions and inject disruptions — ChainMind performs the full analysis
           </p>
         </div>
@@ -429,8 +436,8 @@ export default function ManualModeTab() {
           {/* Run label */}
           <div className="card">
             <div className="card-header flex items-center gap-2">
-              <Activity className="w-4 h-4 text-purple-400" />
-              <h3 className="text-sm font-semibold text-slate-200">Run Settings</h3>
+              <Activity className="w-4 h-4 text-purple-600" />
+              <h3 className="text-sm font-semibold text-gray-800">Run Settings</h3>
             </div>
             <div className="card-body">
               <label className="label text-xs">Run Label (optional)</label>
@@ -447,12 +454,12 @@ export default function ManualModeTab() {
           <div className="card">
             <div className="card-header flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Cloud className="w-4 h-4 text-blue-400" />
-                <h3 className="text-sm font-semibold text-slate-200">Environmental Conditions</h3>
-                <span className="text-xs text-slate-500">({conditions.length})</span>
+                <Cloud className="w-4 h-4 text-blue-500" />
+                <h3 className="text-sm font-semibold text-gray-800">Environmental Conditions</h3>
+                <span className="text-xs text-gray-400">({conditions.length})</span>
               </div>
               <button onClick={addCondition}
-                className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300">
+                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700">
                 <Plus className="w-3.5 h-3.5" /> Add
               </button>
             </div>
@@ -463,7 +470,7 @@ export default function ManualModeTab() {
                   onRemove={() => removeCondition(i)} />
               ))}
               {conditions.length === 0 && (
-                <p className="text-xs text-slate-500 text-center py-2">
+                <p className="text-xs text-gray-400 text-center py-2">
                   No conditions — click "Add" to set environmental conditions
                 </p>
               )}
@@ -474,12 +481,12 @@ export default function ManualModeTab() {
           <div className="card">
             <div className="card-header flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-orange-400" />
-                <h3 className="text-sm font-semibold text-slate-200">Direct Disruptions</h3>
-                <span className="text-xs text-slate-500">({disruptions.length})</span>
+                <AlertTriangle className="w-4 h-4 text-orange-500" />
+                <h3 className="text-sm font-semibold text-gray-800">Direct Disruptions</h3>
+                <span className="text-xs text-gray-400">({disruptions.length})</span>
               </div>
               <button onClick={addDisruption}
-                className="flex items-center gap-1 text-xs text-orange-400 hover:text-orange-300">
+                className="flex items-center gap-1 text-xs text-orange-600 hover:text-orange-700">
                 <Plus className="w-3.5 h-3.5" /> Add
               </button>
             </div>
@@ -490,7 +497,7 @@ export default function ManualModeTab() {
                   onRemove={() => removeDisruption(i)} />
               ))}
               {disruptions.length === 0 && (
-                <p className="text-xs text-slate-500 text-center py-2">
+                <p className="text-xs text-gray-400 text-center py-2">
                   No direct disruptions — add one or let conditions drive disruptions causally
                 </p>
               )}
@@ -502,24 +509,24 @@ export default function ManualModeTab() {
             <div className="card-header flex items-center justify-between cursor-pointer"
               onClick={() => setShowConnections(v => !v)}>
               <div className="flex items-center gap-2">
-                <Network className="w-4 h-4 text-cyan-400" />
-                <h3 className="text-sm font-semibold text-slate-200">Interrupt Connections</h3>
+                <Network className="w-4 h-4 text-cyan-600" />
+                <h3 className="text-sm font-semibold text-gray-800">Interrupt Connections</h3>
                 {interruptConnIds.length > 0 && (
-                  <span className="text-xs bg-red-900/40 text-red-400 border border-red-700 px-2 py-0.5 rounded-full">
+                  <span className="text-xs bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">
                     {interruptConnIds.length} selected
                   </span>
                 )}
               </div>
-              {showConnections ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+              {showConnections ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
             </div>
             {showConnections && (
               <div className="card-body">
                 {loadingConnections ? (
-                  <div className="flex items-center justify-center py-4 text-slate-400 text-xs gap-2">
+                  <div className="flex items-center justify-center py-4 text-gray-400 text-xs gap-2">
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />Loading connections...
                   </div>
                 ) : connections.length === 0 ? (
-                  <p className="text-xs text-slate-500 text-center py-2">
+                  <p className="text-xs text-gray-400 text-center py-2">
                     Connections will be bootstrapped from routes on first use
                   </p>
                 ) : (
@@ -528,29 +535,29 @@ export default function ManualModeTab() {
                       <div key={conn.connection_id}
                         className={`flex items-center gap-2 p-2 rounded cursor-pointer text-xs transition-colors ${
                           interruptConnIds.includes(conn.connection_id)
-                            ? 'bg-red-900/40 border border-red-700'
-                            : 'hover:bg-slate-700 border border-transparent'
+                            ? 'bg-red-50 border border-red-300'
+                            : 'hover:bg-gray-100 border border-transparent'
                         }`}
                         onClick={() => toggleInterruptConn(conn.connection_id)}>
                         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                           conn.status === 'unavailable' ? 'bg-red-500' :
-                          conn.status === 'degraded' ? 'bg-yellow-500' : 'bg-green-500'
+                          conn.status === 'degraded' ? 'bg-amber-400' : 'bg-green-500'
                         }`} />
-                        <span className="flex-1 truncate text-slate-200">{conn.name || `${conn.from_node}→${conn.to_node}`}</span>
-                        <span className="text-slate-500 flex-shrink-0">{conn.transport_mode}</span>
+                        <span className="flex-1 truncate text-gray-700">{conn.name || `${conn.from_node}→${conn.to_node}`}</span>
+                        <span className="text-gray-400 flex-shrink-0">{conn.transport_mode}</span>
                         {interruptConnIds.includes(conn.connection_id) && (
-                          <span className="text-red-400 font-medium flex-shrink-0">INTERRUPT</span>
+                          <span className="text-red-600 font-medium flex-shrink-0">INTERRUPT</span>
                         )}
                       </div>
                     ))}
                     {connections.length > 50 && (
-                      <p className="text-xs text-slate-500 text-center py-1">
+                      <p className="text-xs text-gray-400 text-center py-1">
                         Showing first 50 of {connections.length} connections
                       </p>
                     )}
                   </div>
                 )}
-                <button onClick={loadConnections} className="mt-2 text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1">
+                <button onClick={loadConnections} className="mt-2 text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1">
                   <RefreshCw className="w-3 h-3" /> Refresh connections
                 </button>
               </div>
@@ -559,7 +566,7 @@ export default function ManualModeTab() {
 
           {/* Error */}
           {error && (
-            <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 text-red-300 text-xs">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-xs">
               <strong>Error:</strong> {error}
             </div>
           )}
@@ -577,7 +584,7 @@ export default function ManualModeTab() {
             )}
           </button>
 
-          <p className="text-xs text-slate-500 text-center">
+          <p className="text-xs text-gray-400 text-center">
             ChainMind will compute all impacts, risks, and recovery strategies automatically
           </p>
         </div>
@@ -587,15 +594,15 @@ export default function ManualModeTab() {
 
           {/* Causal info panel — always visible after run */}
           {result && causalInfo && (
-            <div className="card border-purple-700/50">
+            <div className="card border-purple-200">
               <div className="card-header flex items-center gap-2">
-                <Activity className="w-4 h-4 text-purple-400" />
-                <h3 className="text-sm font-semibold text-purple-300">Causal Analysis</h3>
+                <Activity className="w-4 h-4 text-purple-600" />
+                <h3 className="text-sm font-semibold text-purple-700">Causal Analysis</h3>
               </div>
               <div className="card-body space-y-3">
                 {/* Narrative */}
                 {causalInfo.causal_narrative && (
-                  <div className="text-xs text-slate-300 bg-slate-800/50 rounded p-3 border border-slate-700">
+                  <div className="text-xs text-gray-700 bg-purple-50 rounded p-3 border border-purple-200">
                     {causalInfo.causal_narrative}
                   </div>
                 )}
@@ -603,17 +610,17 @@ export default function ManualModeTab() {
                 {/* Violations */}
                 {causalInfo.violations.length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-slate-400 mb-1.5">Threshold Violations</p>
+                    <p className="text-xs font-medium text-gray-600 mb-1.5">Threshold Violations</p>
                     <div className="space-y-1">
                       {causalInfo.violations.map((v, i) => (
-                        <div key={i} className="flex items-start gap-2 text-xs p-2 bg-yellow-900/20 border border-yellow-800/40 rounded">
-                          <AlertTriangle className="w-3.5 h-3.5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                        <div key={i} className="flex items-start gap-2 text-xs p-2 bg-amber-50 border border-amber-200 rounded">
+                          <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <span className="text-yellow-300 font-medium">
+                            <span className="text-amber-700 font-medium">
                               {v.condition.replace('_', ' ')} = {v.value?.toFixed(1)} at {v.scope}
                             </span>
                             <br />
-                            <span className="text-slate-400">{v.consequence}</span>
+                            <span className="text-gray-500">{v.consequence}</span>
                           </div>
                           <span className={`ml-auto text-xs px-1.5 py-0.5 rounded border ${severityColor(v.severity)}`}>
                             {v.severity}
@@ -627,19 +634,19 @@ export default function ManualModeTab() {
                 {/* Generated disruptions */}
                 {causalInfo.generated_disruptions.length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-slate-400 mb-1.5">
+                    <p className="text-xs font-medium text-gray-600 mb-1.5">
                       Generated Disruptions ({causalInfo.generated_disruptions.length})
                     </p>
                     <div className="space-y-1">
                       {causalInfo.generated_disruptions.map((d, i) => (
-                        <div key={i} className="flex items-start gap-2 text-xs p-2 bg-red-900/20 border border-red-800/40 rounded">
-                          <Zap className="w-3.5 h-3.5 text-red-400 flex-shrink-0 mt-0.5" />
+                        <div key={i} className="flex items-start gap-2 text-xs p-2 bg-red-50 border border-red-200 rounded">
+                          <Zap className="w-3.5 h-3.5 text-red-500 flex-shrink-0 mt-0.5" />
                           <div className="flex-1">
-                            <span className="text-red-300 font-medium">
+                            <span className="text-red-700 font-medium">
                               {d.disruption_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} at {d.scope_name}
                             </span>
                             <br />
-                            <span className="text-slate-400 line-clamp-2">{d.causal_reason}</span>
+                            <span className="text-gray-500 line-clamp-2">{d.causal_reason}</span>
                           </div>
                           <span className={`text-xs px-1.5 py-0.5 rounded border ${severityColor(d.severity)}`}>
                             {d.severity}
@@ -653,14 +660,14 @@ export default function ManualModeTab() {
                 {/* Connection impact */}
                 {result.connection_impact && Object.keys(result.connection_impact).length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-slate-400 mb-1.5">Connection Interruptions</p>
+                    <p className="text-xs font-medium text-gray-600 mb-1.5">Connection Interruptions</p>
                     {Object.entries(result.connection_impact).map(([connId, impact]) => (
-                      <div key={connId} className="text-xs p-2 bg-slate-800 border border-red-800/40 rounded mb-1">
-                        <span className="text-red-300 font-medium">
+                      <div key={connId} className="text-xs p-2 bg-red-50 border border-red-200 rounded mb-1">
+                        <span className="text-red-700 font-medium">
                           {impact.connection?.name || connId}
                         </span>
                         {' — '}
-                        <span className="text-slate-400">
+                        <span className="text-gray-500">
                           {impact.affected_route_count} routes, {impact.affected_shipment_count} shipments affected
                         </span>
                       </div>
@@ -674,13 +681,13 @@ export default function ManualModeTab() {
           {/* No result placeholder */}
           {!result && !loading && (
             <div className="card p-8 text-center">
-              <Settings className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-              <h3 className="text-slate-400 font-medium mb-1">Manual Mode Ready</h3>
-              <p className="text-slate-500 text-sm">
+              <Settings className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <h3 className="text-gray-600 font-medium mb-1">Manual Mode Ready</h3>
+              <p className="text-gray-500 text-sm">
                 Set conditions, add direct disruptions or interrupt connections on the left,
-                then click <strong className="text-slate-300">Run Manual Simulation</strong>.
+                then click <strong className="text-gray-700">Run Manual Simulation</strong>.
               </p>
-              <p className="text-slate-600 text-xs mt-3">
+              <p className="text-gray-400 text-xs mt-3">
                 ChainMind's Causal Engine will convert conditions into disruptions automatically.
               </p>
             </div>
@@ -688,8 +695,8 @@ export default function ManualModeTab() {
 
           {loading && (
             <div className="card p-8 text-center">
-              <Loader2 className="w-8 h-8 text-purple-400 animate-spin mx-auto mb-3" />
-              <p className="text-slate-300 font-medium">Running causal analysis and simulation...</p>
+              <Loader2 className="w-8 h-8 text-purple-500 animate-spin mx-auto mb-3" />
+              <p className="text-gray-700 font-medium">Running causal analysis and simulation...</p>
             </div>
           )}
         </div>
@@ -707,13 +714,13 @@ export default function ManualModeTab() {
           />
 
           {/* Impact header */}
-          <div className="bg-red-900/20 border border-red-700/60 rounded-xl p-5">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-5">
             <div className="flex flex-wrap items-center gap-3 mb-4">
-              <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
-              <h3 className="text-base font-semibold text-red-300 flex-1">
+              <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <h3 className="text-base font-semibold text-red-700 flex-1">
                 Manual Mode Impact — {result.scenario?.location}
                 {result.run_label && (
-                  <span className="text-slate-400 text-sm font-normal ml-2">({result.run_label})</span>
+                  <span className="text-gray-500 text-sm font-normal ml-2">({result.run_label})</span>
                 )}
               </h3>
               <span className={`badge capitalize text-xs ${
@@ -722,7 +729,7 @@ export default function ManualModeTab() {
               }`}>
                 {result.scenario?.severity} severity
               </span>
-              <span className="text-xs text-slate-500 font-mono">
+              <span className="text-xs text-gray-400 font-mono">
                 ID: {result.simulation_id?.slice(-8)}
               </span>
             </div>
@@ -773,17 +780,41 @@ export default function ManualModeTab() {
             />
           )}
 
+          {/* ── Post-simulation CTAs ─────────────────────────────────────── */}
+          {onNavigate && (
+            <div className="flex flex-wrap items-center gap-3 p-5 bg-slate-50 border border-slate-200 rounded-xl">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-700">Simulation complete — what next?</p>
+                <p className="text-xs text-slate-500 mt-0.5">Review AI recommendations or return to the overview dashboard</p>
+              </div>
+              <button
+                onClick={() => onNavigate('ai-recommendations')}
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"
+              >
+                <BrainCircuit className="w-4 h-4" />
+                View AI Recommendations
+              </button>
+              <button
+                onClick={() => onNavigate('overview')}
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 transition-colors shadow-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Return to Overview
+              </button>
+            </div>
+          )}
+
           {/* Event timeline */}
           {result.simulation_events && result.simulation_events.length > 0 && (
             <div className="card">
               <div className="card-header flex items-center justify-between cursor-pointer"
                 onClick={() => setShowEvents(v => !v)}>
                 <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-purple-400" />
-                  <h3 className="text-sm font-semibold text-slate-200">Crisis Operations Timeline</h3>
-                  <span className="text-xs text-slate-500">({result.simulation_events.length} events)</span>
+                  <Activity className="w-4 h-4 text-purple-600" />
+                  <h3 className="text-sm font-semibold text-gray-800">Crisis Operations Timeline</h3>
+                  <span className="text-xs text-gray-400">({result.simulation_events.length} events)</span>
                 </div>
-                {showEvents ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                {showEvents ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
               </div>
               {showEvents && (
                 <div className="card-body">
@@ -799,19 +830,19 @@ export default function ManualModeTab() {
                             'bg-green-500'
                           }`} />
                           {i < result.simulation_events!.length - 1 && (
-                            <div className="w-px flex-1 bg-slate-700 mt-1 mb-1 min-h-[12px]" />
+                            <div className="w-px flex-1 bg-gray-200 mt-1 mb-1 min-h-[12px]" />
                           )}
                         </div>
                         <div className="flex-1 pb-2">
                           <div className="flex items-center gap-2">
-                            <span className="text-slate-400 uppercase text-xs tracking-wide">{ev.stage?.replace('_', ' ')}</span>
+                            <span className="text-gray-400 uppercase text-xs tracking-wide">{ev.stage?.replace('_', ' ')}</span>
                             {ev.severity && ev.severity !== 'info' && (
                               <span className={`text-xs px-1.5 py-0.5 rounded border ${severityColor(ev.severity)}`}>
                                 {ev.severity}
                               </span>
                             )}
                           </div>
-                          <p className="text-slate-200 mt-0.5">{ev.summary}</p>
+                          <p className="text-gray-700 mt-0.5">{ev.summary}</p>
                         </div>
                       </div>
                     ))}
@@ -825,32 +856,32 @@ export default function ManualModeTab() {
           {result.top_risk_shipments && result.top_risk_shipments.length > 0 && (
             <div className="card">
               <div className="card-header flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-400" />
-                <h3 className="text-sm font-semibold text-slate-200">Top Risk Shipments</h3>
+                <AlertTriangle className="w-4 h-4 text-red-500" />
+                <h3 className="text-sm font-semibold text-gray-800">Top Risk Shipments</h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-700 bg-slate-800/40">
-                      <th className="text-left text-slate-400 font-medium px-4 py-2.5">Shipment ID</th>
-                      <th className="text-center text-slate-400 font-medium px-4 py-2.5">Risk</th>
-                      <th className="text-right text-slate-400 font-medium px-4 py-2.5">Delay</th>
-                      <th className="text-right text-slate-400 font-medium px-4 py-2.5">Cargo Value</th>
-                      <th className="text-center text-slate-400 font-medium px-4 py-2.5">Impact</th>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="text-left text-gray-500 font-medium px-4 py-2.5">Shipment ID</th>
+                      <th className="text-center text-gray-500 font-medium px-4 py-2.5">Risk</th>
+                      <th className="text-right text-gray-500 font-medium px-4 py-2.5">Delay</th>
+                      <th className="text-right text-gray-500 font-medium px-4 py-2.5">Cargo Value</th>
+                      <th className="text-center text-gray-500 font-medium px-4 py-2.5">Impact</th>
                     </tr>
                   </thead>
                   <tbody>
                     {result.top_risk_shipments.slice(0, 10).map(s => (
-                      <tr key={s.shipment_id} className="border-b border-slate-800 hover:bg-slate-800/40">
-                        <td className="px-4 py-2.5 font-mono text-slate-200 text-xs">{s.shipment_id}</td>
+                      <tr key={s.shipment_id} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="px-4 py-2.5 font-mono text-gray-700 text-xs">{s.shipment_id}</td>
                         <td className="px-4 py-2.5 text-center">
                           <span className={`badge capitalize badge-${s.risk_level} text-xs`}>{s.risk_level}</span>
                         </td>
-                        <td className="px-4 py-2.5 text-right text-slate-200">{formatDelay(s.delay_hours)}</td>
-                        <td className="px-4 py-2.5 text-right text-slate-200">{formatCurrency(s.cargo_value)}</td>
+                        <td className="px-4 py-2.5 text-right text-gray-700">{formatDelay(s.delay_hours)}</td>
+                        <td className="px-4 py-2.5 text-right text-gray-700">{formatCurrency(s.cargo_value)}</td>
                         <td className="px-4 py-2.5 text-center">
                           <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-                            s.is_direct ? 'bg-red-900/40 text-red-300' : 'bg-orange-900/40 text-orange-300'
+                            s.is_direct ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-orange-50 text-orange-700 border border-orange-200'
                           }`}>
                             {s.is_direct ? 'Direct' : 'Cascade'}
                           </span>

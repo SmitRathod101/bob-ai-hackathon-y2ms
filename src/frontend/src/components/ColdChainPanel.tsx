@@ -21,10 +21,10 @@ export default function ColdChainPanel({ shipments, totalAtRisk }: ColdChainPane
     return (
       <div className="card">
         <div className="card-header flex items-center gap-2">
-          <ThermometerSnowflake className="w-4 h-4 text-cyan-400" />
-          <h3 className="text-sm font-semibold text-slate-200">Cold-Chain Impact</h3>
+          <ThermometerSnowflake className="w-4 h-4 text-cyan-500" />
+          <h3 className="text-sm font-semibold text-gray-800">Cold-Chain Impact</h3>
         </div>
-        <div className="card-body text-center text-slate-500 text-sm py-8">
+        <div className="card-body text-center text-gray-400 text-sm py-8">
           No cold-chain shipments affected in this scenario.
         </div>
       </div>
@@ -40,66 +40,66 @@ export default function ColdChainPanel({ shipments, totalAtRisk }: ColdChainPane
     <div className="card">
       <div className="card-header flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ThermometerSnowflake className="w-4 h-4 text-cyan-400" />
-          <h3 className="text-sm font-semibold text-slate-200">Cold-Chain Risk</h3>
+          <ThermometerSnowflake className="w-4 h-4 text-cyan-500" />
+          <h3 className="text-sm font-semibold text-gray-800">Cold-Chain Risk</h3>
           <span className="badge badge-high text-xs">{totalAtRisk} at risk</span>
         </div>
-        <span className="text-xs text-slate-500">Exposed: {formatCurrency(totalExposedValue)}</span>
+        <span className="text-xs text-gray-400">Exposed: {formatCurrency(totalExposedValue)}</span>
       </div>
       <div className="card-body space-y-4">
         {/* Summary row */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-red-900/20 border border-red-700/40 rounded-lg p-3 text-center">
-            <p className="text-xl font-bold text-red-400">{critical}</p>
-            <p className="text-xs text-slate-400 mt-0.5">Critical (&gt;70%)</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+            <p className="text-xl font-bold text-red-600">{critical}</p>
+            <p className="text-xs text-gray-500 mt-0.5">Critical (&gt;70%)</p>
           </div>
-          <div className="bg-orange-900/20 border border-orange-700/40 rounded-lg p-3 text-center">
-            <p className="text-xl font-bold text-orange-400">{high}</p>
-            <p className="text-xs text-slate-400 mt-0.5">High (50–70%)</p>
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center">
+            <p className="text-xl font-bold text-orange-600">{high}</p>
+            <p className="text-xs text-gray-500 mt-0.5">High (50–70%)</p>
           </div>
-          <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-3 text-center">
-            <p className="text-xl font-bold text-yellow-400">{medium}</p>
-            <p className="text-xs text-slate-400 mt-0.5">Medium (30–50%)</p>
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
+            <p className="text-xl font-bold text-amber-600">{medium}</p>
+            <p className="text-xs text-gray-500 mt-0.5">Medium (30–50%)</p>
           </div>
         </div>
 
         {/* Risk bar visualization */}
         <div className="space-y-2">
-          <p className="text-xs text-slate-400 font-medium">Top cold-chain shipments by risk:</p>
+          <p className="text-xs text-gray-600 font-medium">Top cold-chain shipments by risk:</p>
           {coldChainShipments
             .sort((a, b) => b.cold_chain_risk - a.cold_chain_risk)
             .slice(0, 8)
             .map(s => (
               <div key={s.shipment_id} className="flex items-center gap-3">
                 <div className="flex items-center gap-1 w-20 flex-shrink-0">
-                  <Thermometer className="w-3 h-3 text-cyan-400 flex-shrink-0" />
-                  <span className="text-xs font-mono text-slate-300 truncate">{s.shipment_id}</span>
+                  <Thermometer className="w-3 h-3 text-cyan-500 flex-shrink-0" />
+                  <span className="text-xs font-mono text-gray-600 truncate">{s.shipment_id}</span>
                 </div>
-                <div className="flex-1 h-4 bg-slate-700 rounded-full overflow-hidden">
+                <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all ${
                       s.cold_chain_risk > 0.7 ? 'bg-red-500' :
                       s.cold_chain_risk > 0.5 ? 'bg-orange-500' :
-                      s.cold_chain_risk > 0.3 ? 'bg-yellow-500' : 'bg-cyan-500'
+                      s.cold_chain_risk > 0.3 ? 'bg-amber-500' : 'bg-cyan-500'
                     }`}
                     style={{ width: `${s.cold_chain_risk * 100}%` }}
                   />
                 </div>
                 <span className={`text-xs font-medium w-10 text-right flex-shrink-0 ${
-                  s.cold_chain_risk > 0.7 ? 'text-red-400' :
-                  s.cold_chain_risk > 0.5 ? 'text-orange-400' :
-                  s.cold_chain_risk > 0.3 ? 'text-yellow-400' : 'text-cyan-400'
+                  s.cold_chain_risk > 0.7 ? 'text-red-600' :
+                  s.cold_chain_risk > 0.5 ? 'text-orange-600' :
+                  s.cold_chain_risk > 0.3 ? 'text-amber-600' : 'text-cyan-600'
                 }`}>
                   {(s.cold_chain_risk * 100).toFixed(0)}%
                 </span>
-                <span className="text-xs text-slate-500 w-16 text-right flex-shrink-0">
+                <span className="text-xs text-gray-400 w-16 text-right flex-shrink-0">
                   {formatDelay(s.delay_hours)}
                 </span>
               </div>
             ))}
         </div>
 
-        <div className="bg-cyan-900/20 border border-cyan-700/30 rounded-lg p-3 text-xs text-cyan-300">
+        <div className="bg-cyan-50 border border-cyan-200 rounded-lg p-3 text-xs text-cyan-700">
           <AlertTriangle className="w-3 h-3 inline mr-1.5" />
           Temperature-sensitive cargo (vaccines, pharmaceuticals, produce) requires refrigerated vehicles for recovery.
           Deploy cold-chain fleet immediately for Critical-risk shipments.

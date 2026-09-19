@@ -11,10 +11,10 @@ const RISK_COLORS = {
   low: '#22c55e',
 };
 
-const DARK_TOOLTIP = {
-  contentStyle: { background: '#1e293b', border: '1px solid #334155', color: '#e2e8f0', fontSize: 12 },
-  itemStyle: { color: '#e2e8f0' },
-  labelStyle: { color: '#94a3b8' },
+const LIGHT_TOOLTIP = {
+  contentStyle: { background: '#ffffff', border: '1px solid #e5e7eb', color: '#1f2328', fontSize: 12, borderRadius: 6 },
+  itemStyle: { color: '#374151' },
+  labelStyle: { color: '#6b7280' },
 };
 
 interface RiskChartsProps {
@@ -45,7 +45,7 @@ export default function RiskCharts({ riskDistribution, delayDistribution, strate
       {/* Risk Distribution Pie */}
       <div className="card">
         <div className="card-header">
-          <h3 className="text-sm font-semibold text-slate-200">Risk Distribution</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Risk Distribution</h3>
         </div>
         <div className="card-body flex items-center justify-center">
           <ResponsiveContainer width="100%" height={200}>
@@ -66,9 +66,9 @@ export default function RiskCharts({ riskDistribution, delayDistribution, strate
                   />
                 ))}
               </Pie>
-              <Tooltip {...DARK_TOOLTIP} />
+              <Tooltip {...LIGHT_TOOLTIP} />
               <Legend
-                formatter={(value) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{value}</span>}
+                formatter={(value) => <span style={{ color: '#6b7280', fontSize: 12 }}>{value}</span>}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -78,15 +78,15 @@ export default function RiskCharts({ riskDistribution, delayDistribution, strate
       {/* Delay Distribution Bar */}
       <div className="card">
         <div className="card-header">
-          <h3 className="text-sm font-semibold text-slate-200">Delay Distribution</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Delay Distribution</h3>
         </div>
         <div className="card-body">
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={delayData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="range" tick={{ fill: '#94a3b8', fontSize: 10 }} />
-              <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} />
-              <Tooltip {...DARK_TOOLTIP} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="range" tick={{ fill: '#6b7280', fontSize: 10 }} />
+              <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} />
+              <Tooltip {...LIGHT_TOOLTIP} />
               <Bar dataKey="count" name="Shipments" fill="#3b82f6" radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -96,18 +96,18 @@ export default function RiskCharts({ riskDistribution, delayDistribution, strate
       {/* Strategy Comparison Bar */}
       <div className="card">
         <div className="card-header">
-          <h3 className="text-sm font-semibold text-slate-200">Strategy Comparison</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Strategy Comparison</h3>
         </div>
         <div className="card-body">
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={strategyData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 10 }} />
-              <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} />
-              <Tooltip {...DARK_TOOLTIP} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="name" tick={{ fill: '#6b7280', fontSize: 10 }} />
+              <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} />
+              <Tooltip {...LIGHT_TOOLTIP} />
               <Bar dataKey="delay" name="Avg Delay (h)" fill="#f97316" radius={[3, 3, 0, 0]} />
               <Bar dataKey="cost" name="Cost (₹L)" fill="#3b82f6" radius={[3, 3, 0, 0]} />
-              <Legend formatter={(v) => <span style={{ color: '#94a3b8', fontSize: 11 }}>{v}</span>} />
+              <Legend formatter={(v) => <span style={{ color: '#6b7280', fontSize: 11 }}>{v}</span>} />
             </BarChart>
           </ResponsiveContainer>
         </div>

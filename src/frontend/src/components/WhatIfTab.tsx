@@ -22,8 +22,8 @@ const LOCATIONS = [
   'Kochi', 'Visakhapatnam', 'Kandla', 'Delhi', 'Ahmedabad', 'Bengaluru', 'Hyderabad',
 ];
 
-const DARK_TOOLTIP = {
-  contentStyle: { background: '#1e293b', border: '1px solid #334155', color: '#e2e8f0', fontSize: 12 },
+const LIGHT_TOOLTIP = {
+  contentStyle: { background: '#ffffff', border: '1px solid #e5e7eb', color: '#1f2328', fontSize: 12, borderRadius: 6 },
 };
 
 // Quick-start presets for common what-if explorations
@@ -113,8 +113,8 @@ export default function WhatIfTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-white">What-If Scenario Comparison</h2>
-        <p className="text-slate-400 text-sm mt-0.5">
+        <h2 className="text-xl font-semibold text-gray-900">What-If Scenario Comparison</h2>
+        <p className="text-gray-500 text-sm mt-0.5">
           The supply-chain time machine — compare multiple disruption scenarios side-by-side
         </p>
       </div>
@@ -122,18 +122,18 @@ export default function WhatIfTab() {
       {/* Quick Presets */}
       <div className="card">
         <div className="card-header flex items-center gap-2">
-          <Zap className="w-4 h-4 text-yellow-400" />
-          <span className="text-sm font-semibold text-slate-200">Quick Presets</span>
+          <Zap className="w-4 h-4 text-amber-500" />
+          <span className="text-sm font-semibold text-gray-800">Quick Presets</span>
         </div>
         <div className="card-body pt-3 pb-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
           {QUICK_PRESETS.map(preset => (
             <button
               key={preset.label}
               onClick={() => loadPreset(preset)}
-              className="text-left bg-slate-700 hover:bg-slate-600 border border-slate-600 hover:border-blue-600 px-3 py-2.5 rounded-lg transition-colors"
+              className="text-left bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-400 px-3 py-2.5 rounded-lg transition-colors"
             >
-              <div className="text-xs font-semibold text-slate-200">{preset.label}</div>
-              <div className="text-xs text-slate-500 mt-0.5">{preset.description}</div>
+              <div className="text-xs font-semibold text-gray-800">{preset.label}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{preset.description}</div>
             </button>
           ))}
         </div>
@@ -143,9 +143,9 @@ export default function WhatIfTab() {
       <div className="card">
         <div className="card-header flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <GitCompare className="w-4 h-4 text-blue-400" />
-            <h3 className="text-sm font-semibold text-slate-200">Configure Scenarios</h3>
-            <span className="text-xs text-slate-500">({scenarios.length}/5)</span>
+            <GitCompare className="w-4 h-4 text-blue-600" />
+            <h3 className="text-sm font-semibold text-gray-800">Configure Scenarios</h3>
+            <span className="text-xs text-gray-400">({scenarios.length}/5)</span>
           </div>
           <button onClick={addScenario} disabled={scenarios.length >= 5} className="btn-secondary flex items-center gap-1 text-xs">
             <Plus className="w-3 h-3" /> Add Scenario
@@ -154,13 +154,13 @@ export default function WhatIfTab() {
         <div className="card-body">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {scenarios.map((s, idx) => (
-              <div key={idx} className="bg-slate-800/60 border border-slate-600 rounded-xl p-4 space-y-3">
+              <div key={idx} className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                       idx === 0 ? 'bg-blue-600' : idx === 1 ? 'bg-purple-600' : idx === 2 ? 'bg-orange-600' : 'bg-pink-600'
                     }`}>{idx + 1}</span>
-                    <span className="text-sm font-medium text-slate-200">Scenario {idx + 1}</span>
+                    <span className="text-sm font-medium text-gray-800">Scenario {idx + 1}</span>
                   </div>
                   {scenarios.length > 2 && (
                     <button onClick={() => removeScenario(idx)} className="text-red-400 hover:text-red-300">
@@ -196,9 +196,9 @@ export default function WhatIfTab() {
                         className={`py-1 rounded text-xs font-medium capitalize transition-colors ${
                           s.severity === sev
                             ? sev === 'high' ? 'bg-red-600 text-white'
-                              : sev === 'medium' ? 'bg-yellow-600 text-white'
+                              : sev === 'medium' ? 'bg-amber-500 text-white'
                               : 'bg-green-600 text-white'
-                            : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                            : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
                         }`}>
                         {sev}
                       </button>
@@ -210,7 +210,7 @@ export default function WhatIfTab() {
           </div>
 
           {error && (
-            <div className="mt-4 bg-red-900/30 border border-red-700 rounded-lg p-3 text-red-300 text-xs">{error}</div>
+            <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-xs">{error}</div>
           )}
 
           <button onClick={handleRun} disabled={loading}
@@ -223,24 +223,24 @@ export default function WhatIfTab() {
       </div>
 
       {/* Results */}
-      {result && (
-        <div className="space-y-5">
-          {/* Header banner */}
-          <div className="bg-blue-900/20 border border-blue-700 rounded-xl p-5">
-            <div className="flex flex-wrap items-center gap-3 mb-3">
-              <TrendingUp className="w-5 h-5 text-blue-400" />
-              <h3 className="text-base font-semibold text-blue-300">What-If Comparison Results</h3>
-              <span className="text-xs text-slate-400">
-                {result.comparison.scenario_labels.length} scenarios compared
-              </span>
-            </div>
-            {result.comparison.delay_increase_pct > 0 && (
-              <p className="text-sm text-slate-300">
-                Worst-case scenario causes <strong className="text-red-400">{result.comparison.delay_increase_pct}%</strong> more
-                delay than best-case scenario — <strong className="text-green-400">{result.comparison.scenario_labels[result.comparison.best_scenario_idx]}</strong> is least severe.
-              </p>
-            )}
+    {result && (
+      <div className="space-y-5">
+        {/* Header banner */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+          <div className="flex flex-wrap items-center gap-3 mb-3">
+            <TrendingUp className="w-5 h-5 text-blue-600" />
+            <h3 className="text-base font-semibold text-blue-700">What-If Comparison Results</h3>
+            <span className="text-xs text-gray-400">
+              {result.comparison.scenario_labels.length} scenarios compared
+            </span>
           </div>
+          {result.comparison.delay_increase_pct > 0 && (
+            <p className="text-sm text-gray-700">
+              Worst-case scenario causes <strong className="text-red-600">{result.comparison.delay_increase_pct}%</strong> more
+              delay than best-case scenario — <strong className="text-green-600">{result.comparison.scenario_labels[result.comparison.best_scenario_idx]}</strong> is least severe.
+            </p>
+          )}
+        </div>
 
           {/* Quick delta summary cards (best vs worst) */}
           {result.scenarios.length >= 2 && (() => {
@@ -419,27 +419,27 @@ function DeltaComparisonTable({
   return (
     <div className="card">
       <div className="card-header flex items-center gap-2">
-        <ArrowRight className="w-4 h-4 text-blue-400" />
-        <h3 className="text-sm font-semibold text-slate-200">Side-by-Side Delta Comparison</h3>
+        <ArrowRight className="w-4 h-4 text-blue-600" />
+        <h3 className="text-sm font-semibold text-gray-800">Side-by-Side Delta Comparison</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-700 bg-slate-800/40">
-              <th className="text-left text-slate-400 font-medium px-5 py-2.5 w-44">Metric</th>
-              <th className="text-center text-blue-400 font-semibold px-4 py-2.5">
+            <tr className="border-b border-gray-200 bg-gray-50">
+              <th className="text-left text-gray-500 font-medium px-5 py-2.5 w-44">Metric</th>
+              <th className="text-center text-blue-600 font-semibold px-4 py-2.5">
                 <span className="flex items-center justify-center gap-1.5">
                   <span className="w-4 h-4 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">1</span>
                   {labelA.length > 24 ? labelA.slice(0, 24) + '…' : labelA}
                 </span>
               </th>
-              <th className="text-center text-purple-400 font-semibold px-4 py-2.5">
+              <th className="text-center text-purple-600 font-semibold px-4 py-2.5">
                 <span className="flex items-center justify-center gap-1.5">
                   <span className="w-4 h-4 rounded-full bg-purple-600 text-white text-xs flex items-center justify-center font-bold">2</span>
                   {labelB.length > 24 ? labelB.slice(0, 24) + '…' : labelB}
                 </span>
               </th>
-              <th className="text-center text-slate-400 font-medium px-4 py-2.5">Δ Change</th>
+              <th className="text-center text-gray-500 font-medium px-4 py-2.5">Δ Change</th>
             </tr>
           </thead>
           <tbody>
@@ -450,24 +450,24 @@ function DeltaComparisonTable({
               const improved = row.higherIsBetter ? diff > 0 : diff < 0;
 
               return (
-                <tr key={row.label} className="border-b border-slate-800 hover:bg-slate-800/30">
-                  <td className="px-5 py-3 text-slate-400 font-medium text-xs">{row.label}</td>
+                <tr key={row.label} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="px-5 py-3 text-gray-500 font-medium text-xs">{row.label}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className="text-slate-200 font-medium">{row.valA}</span>
+                    <span className="text-gray-800 font-medium">{row.valA}</span>
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`font-medium ${worsened ? 'text-red-300' : improved ? 'text-green-300' : 'text-slate-200'}`}>
+                    <span className={`font-medium ${worsened ? 'text-red-600' : improved ? 'text-green-600' : 'text-gray-800'}`}>
                       {row.valB}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center">
                     {diff === 0 ? (
-                      <span className="flex items-center justify-center gap-1 text-slate-500 text-xs">
+                      <span className="flex items-center justify-center gap-1 text-gray-400 text-xs">
                         <Minus className="w-3 h-3" /> No change
                       </span>
                     ) : (
                       <span className={`flex items-center justify-center gap-1 text-xs font-medium ${
-                        worsened ? 'text-red-400' : 'text-green-400'
+                        worsened ? 'text-red-600' : 'text-green-600'
                       }`}>
                         {worsened
                           ? <TrendingUp className="w-3 h-3" />
@@ -484,12 +484,12 @@ function DeltaComparisonTable({
         </table>
       </div>
       {strategyChanged && (
-        <div className="px-5 py-3 bg-yellow-900/20 border-t border-yellow-700/40 flex items-center gap-2">
-          <span className="text-yellow-400 text-sm font-semibold">⚠ Recommendation changed:</span>
-          <span className="text-slate-300 text-sm">
-            <span className="text-blue-400 capitalize">{ra?.strategy_type}</span>
+        <div className="px-5 py-3 bg-amber-50 border-t border-amber-200 flex items-center gap-2">
+          <span className="text-amber-700 text-sm font-semibold">⚠ Recommendation changed:</span>
+          <span className="text-gray-700 text-sm">
+            <span className="text-blue-600 capitalize">{ra?.strategy_type}</span>
             {' → '}
-            <span className="text-purple-400 capitalize">{rb?.strategy_type}</span>
+            <span className="text-purple-600 capitalize">{rb?.strategy_type}</span>
             {' '}as conditions worsen
           </span>
         </div>
@@ -523,14 +523,14 @@ function ComparisonCharts({ comparison }: { comparison: WhatIfResult['comparison
         { key: 'value' as const, name: 'Cargo Exposed (₹ Lakhs)', color: '#8b5cf6', label: '₹L' },
       ].map(({ key, name, color, label }) => (
         <div key={key} className="card">
-          <div className="card-header"><h3 className="text-sm font-semibold text-slate-200">{name}</h3></div>
+          <div className="card-header"><h3 className="text-sm font-semibold text-gray-800">{name}</h3></div>
           <div className="card-body">
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={chartData} margin={{ left: -10, bottom: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 10 }} angle={-20} textAnchor="end" />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} />
-                <Tooltip {...DARK_TOOLTIP} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 10 }} angle={-20} textAnchor="end" />
+                <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} />
+                <Tooltip {...LIGHT_TOOLTIP} />
                 <Bar dataKey={key} name={label} fill={color} radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -576,20 +576,20 @@ function RadarComparisonChart({
   return (
     <div className="card">
       <div className="card-header">
-        <h3 className="text-sm font-semibold text-slate-200">Multi-Dimension Impact Radar</h3>
-        <p className="text-xs text-slate-500 mt-0.5">Relative severity across impact dimensions (normalized to worst case = 100)</p>
+        <h3 className="text-sm font-semibold text-gray-800">Multi-Dimension Impact Radar</h3>
+        <p className="text-xs text-gray-400 mt-0.5">Relative severity across impact dimensions (normalized to worst case = 100)</p>
       </div>
       <div className="card-body flex justify-center">
         <ResponsiveContainer width="100%" height={280}>
           <RadarChart data={radarData} margin={{ top: 10, right: 40, bottom: 10, left: 40 }}>
-            <PolarGrid stroke="#334155" />
-            <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <PolarGrid stroke="#e5e7eb" />
+            <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280', fontSize: 11 }} />
             <Radar name={labelA.length > 20 ? labelA.slice(0, 20) + '…' : labelA}
-              dataKey="A" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.25} strokeWidth={2} />
+              dataKey="A" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.2} strokeWidth={2} />
             <Radar name={labelB.length > 20 ? labelB.slice(0, 20) + '…' : labelB}
-              dataKey="B" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.25} strokeWidth={2} />
-            <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
-            <Tooltip {...DARK_TOOLTIP} />
+              dataKey="B" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.2} strokeWidth={2} />
+            <Legend wrapperStyle={{ fontSize: 12, color: '#6b7280' }} />
+            <Tooltip {...LIGHT_TOOLTIP} />
           </RadarChart>
         </ResponsiveContainer>
       </div>
@@ -608,13 +608,13 @@ function ScenarioResultCard({ scenario, label, colorIdx, isWorst, isBest }: {
 }) {
   const imp = scenario.impact_summary;
   const rec = scenario.recommended_strategy;
-  const COLORS = ['border-blue-600', 'border-purple-600', 'border-orange-600', 'border-pink-600'];
-  const HEADER_COLORS = ['bg-blue-900/20', 'bg-purple-900/20', 'bg-orange-900/20', 'bg-pink-900/20'];
-  const BADGE_COLORS = ['text-blue-300', 'text-purple-300', 'text-orange-300', 'text-pink-300'];
+  const COLORS = ['border-blue-300', 'border-purple-300', 'border-orange-300', 'border-pink-300'];
+  const HEADER_COLORS = ['bg-blue-50', 'bg-purple-50', 'bg-orange-50', 'bg-pink-50'];
+  const BADGE_COLORS = ['text-blue-700', 'text-purple-700', 'text-orange-700', 'text-pink-700'];
 
   return (
-    <div className={`card border-2 ${isWorst ? 'border-red-700' : isBest ? 'border-green-700' : COLORS[colorIdx % COLORS.length]}`}>
-      <div className={`card-header ${isWorst ? 'bg-red-900/20' : isBest ? 'bg-green-900/20' : HEADER_COLORS[colorIdx % HEADER_COLORS.length]}`}>
+    <div className={`card border-2 ${isWorst ? 'border-red-400' : isBest ? 'border-green-400' : COLORS[colorIdx % COLORS.length]}`}>
+      <div className={`card-header ${isWorst ? 'bg-red-50' : isBest ? 'bg-green-50' : HEADER_COLORS[colorIdx % HEADER_COLORS.length]}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${
@@ -637,14 +637,14 @@ function ScenarioResultCard({ scenario, label, colorIdx, isWorst, isBest }: {
         <MetricLine label="Cold Chain" value={`${imp.cold_chain_at_risk} at risk`} />
         <MetricLine label="High Priority" value={`${imp.high_priority_affected} affected`} />
         {rec && (
-          <div className="pt-2 border-t border-slate-700">
-            <p className="text-xs text-slate-500">Recommended strategy:</p>
-            <p className="text-xs text-white font-medium capitalize mt-0.5">{rec.strategy_type}</p>
+          <div className="pt-2 border-t border-gray-200">
+            <p className="text-xs text-gray-400">Recommended strategy:</p>
+            <p className="text-xs text-gray-900 font-medium capitalize mt-0.5">{rec.strategy_type}</p>
             <div className="flex gap-3 mt-1">
-              <span className="text-xs text-slate-400">{formatCurrency(rec.additional_cost_inr)}</span>
-              <span className="text-xs text-slate-400">{formatDelay(rec.average_delay_hours)}</span>
+              <span className="text-xs text-gray-500">{formatCurrency(rec.additional_cost_inr)}</span>
+              <span className="text-xs text-gray-500">{formatDelay(rec.average_delay_hours)}</span>
               <span className={`text-xs capitalize ${
-                rec.risk_level === 'high' || rec.risk_level === 'critical' ? 'text-red-400' : 'text-green-400'
+                rec.risk_level === 'high' || rec.risk_level === 'critical' ? 'text-red-600' : 'text-green-600'
               }`}>{rec.risk_level} risk</span>
             </div>
           </div>
@@ -657,8 +657,8 @@ function ScenarioResultCard({ scenario, label, colorIdx, isWorst, isBest }: {
 function MetricLine({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex justify-between items-center text-sm">
-      <span className="text-slate-400 text-xs">{label}</span>
-      <span className={`font-medium text-xs ${highlight ? 'text-orange-300' : 'text-white'}`}>{value}</span>
+      <span className="text-gray-400 text-xs">{label}</span>
+      <span className={`font-medium text-xs ${highlight ? 'text-orange-600' : 'text-gray-800'}`}>{value}</span>
     </div>
   );
 }
@@ -676,21 +676,21 @@ function WhatIfDeltaCard({
 }) {
   const isNoChange = delta === '+0' || delta === '+0h' || delta === '=';
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-      <div className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">{label}</div>
+    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+      <div className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-3">{label}</div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-green-400 truncate max-w-20" title={bestLabel}>Best</span>
-          <span className="text-sm font-bold text-green-400">{best}</span>
+          <span className="text-xs text-green-600 truncate max-w-20" title={bestLabel}>Best</span>
+          <span className="text-sm font-bold text-green-600">{best}</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-red-400 truncate max-w-20" title={worstLabel}>Worst</span>
-          <span className="text-sm font-bold text-red-400">{worst}</span>
+          <span className="text-xs text-red-600 truncate max-w-20" title={worstLabel}>Worst</span>
+          <span className="text-sm font-bold text-red-600">{worst}</span>
         </div>
         <div className={`text-center py-1 rounded-lg text-xs font-bold mt-1 ${
           isNoChange
-            ? 'bg-slate-700 text-slate-400'
-            : 'bg-red-900/30 border border-red-700/50 text-red-300'
+            ? 'bg-gray-100 text-gray-400'
+            : 'bg-red-50 border border-red-200 text-red-600'
         }`}>
           {isNoChange ? 'No difference' : `Delta: ${delta}`}
         </div>
